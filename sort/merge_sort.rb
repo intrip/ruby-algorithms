@@ -20,7 +20,7 @@ The following diagram from wikipedia shows the complete merge sort process for a
 def merge(arr, start, mid, to)
 	l = arr[start..mid]
 	r = arr[(mid+1)..to]
-	
+
 	nl = l.length
 	nr = r.length
 
@@ -39,18 +39,18 @@ def merge(arr, start, mid, to)
 		k+=1
 	end
 
-	# position the left items if the list doesn't have the same size
+	# position the left items if the left and right array doesn't have the same size
 	while j < nl
 		arr[k] = l[j]
 		j+=1
 		k+=1
 	end
-
 	while i < nr
 		arr[k] = r[i]
 		i+=1
 		k+=1
 	end
+	
 	arr
 end
 
