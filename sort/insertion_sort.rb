@@ -75,10 +75,11 @@ end
 
 arr = [3, 4, 5, 1, 2]
 
+times = 10 ** 6
 require 'benchmark'
-# Benchmark.bm do |x|
-	# x.report("insertion_sort: ") { for i in 1..1000000; insertion_sort(arr.clone) end;}
-# end
+ Benchmark.bm do |x|
+	 x.report("insertion_sort: ") { for i in 1..times; insertion_sort(arr.clone) end;}
+ end
 puts "arr #{arr}"
 puts "Insertion sort: #{insertion_sort(arr.clone)}"
 puts "Insertion sort: #{insertion_sort_pivot(arr.clone)}"

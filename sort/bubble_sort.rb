@@ -21,21 +21,20 @@ Following are implementations of Bubble Sort.
 =end
 
 def bubble_sort(arr)
-	res = arr.clone
 	i=0
-	while i < res.length() -1
+	while i < arr.length() -1
 		j=0
 		# i element are already in order!
-		while j < res.length() -1 -i
-			if res[j] > res[j+1]
+		while j < arr.length() -1 -i
+			if arr[j] > arr[j+1]
 				# swap elements
-				res[j],res[j+1] = res[j+1],res[j]
+				arr[j],arr[j+1] = arr[j+1],arr[j]
 			end
 			j+=1
 		end
 		i+=1
 	end
-	res
+	arr
 end
 
 =begin
@@ -43,24 +42,23 @@ Optimized Implementation:
 The above function always runs O(n^2) time even if the array is sorted. It can be optimized by stopping the algorithm if inner loop didn’t cause any swap.
 =end
 def bubble_sort_opt(arr)
-	res = arr.clone
 	i=0
-	while i < res.length() -1
+	while i < arr.length() -1
 		j=0
 		has_swapped=false
 		# i element are already in order!
-		while j < res.length() -1 -i
-			if res[j] > res[j+1]
+		while j < arr.length() -1 -i
+			if arr[j] > arr[j+1]
 				# swap elements
-				res[j],res[j+1] = res[j+1],res[j]
+				arr[j],arr[j+1] = arr[j+1],arr[j]
 				has_swapped=true
 			end
 			j+=1
 		end
-		return res unless has_swapped
+		return arr unless has_swapped
 		i+=1
 	end
-	res
+	arr
 end
 
 arr = [3, 4, 5, 1, 2]
@@ -68,8 +66,8 @@ times = 10 ** 6
 
 require 'benchmark'
 Benchmark.bm do |x|
-	 x.report("bubble sort: ") { for i in 1..times; bubble_sort(arr); end}
-	 x.report("bubble sort_opt:") { for i in 1..times; bubble_sort_opt(arr); end}
+	 x.report("bubble sort: ") { for i in 1..times; bubble_sort(arr.clone); end}
+	 x.report("bubble sort_opt:") { for i in 1..times; bubble_sort_opt(arr.clone); end}
 end
 puts "Original array: #{arr.inspect}"
 puts "Sorted array with bubble_sort: #{bubble_sort arr}"
