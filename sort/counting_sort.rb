@@ -27,28 +27,25 @@ the output sequence.
 
 # max is the max value of elements, doesn't handle negative numbers
 def counting_sort(arr, max=255)
-	n = arr.length() -1
+	len = arr.length() -1
   res = []
 	count = Array.new(max,0)
 
-	for i in 0..n
+	for i in 0..len
 		count[arr[i]] += 1
 	end
 
- p count
 
 	for i in 1..(max-1)
 		count[i] += count[i-1]
 	end
 
-  p count
-
-	for i in i..n
-    res[count[arr[i]]] = arr[i]
-    count[arr[i]] +=1
+	for i in 0..len
+    res[count[arr[i]]-1] = arr[i]
+    count[arr[i]] -=1
+    p count, res
   end
-
- #  p res
+  res
 end	
 
 arr = [3, 4, 5, 5, 1, 2]
