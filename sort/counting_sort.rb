@@ -43,7 +43,6 @@ def counting_sort(arr, max=255)
 	for i in 0..len
     res[count[arr[i]]-1] = arr[i]
     count[arr[i]] -=1
-    p count, res
   end
   res
 end	
