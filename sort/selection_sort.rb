@@ -19,7 +19,7 @@ arr[] = 64 25 12 22 11
 
 def selection_sort(arr)
 	len = arr.length() -1
-	for i in 0..len
+	for i in 0..(len-1)
 		for j in (i+1)..len
 			min = i
 			# if the j item is smaller then current min
