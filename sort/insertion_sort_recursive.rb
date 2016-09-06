@@ -1,5 +1,5 @@
 # A recursive implementation of insertion_sort
-# In order to sort a[0..n] we recursively sort a[0..n-1] and insert n into the soerter array a[0..n-1]
+# In order to sort a[0..n] we recursively sort a[0..n-1] and insert n into the sorted array a[0..n-1]
 
 def insertion_sort_recursive(arr, n=1)
 	len = arr.length
@@ -24,18 +24,15 @@ def insert_item(arr, pivot, to)
 	# DEUBUG
 	# p pivot, arr[to], to, arr
 	# puts ">>>"
-
-
 	if pivot < arr[to]
 		arr[to+1] = arr[to]
 		insert_item(arr,pivot,to-1)
 	else
+		# we found the position for the pivot
 		arr[to+1]=pivot
 	end
-
-
 end
- 
+
 arr = [3, 4, 5, 1, 2]
 
 puts "Insertion sort recursive: #{insertion_sort_recursive(arr)}"
