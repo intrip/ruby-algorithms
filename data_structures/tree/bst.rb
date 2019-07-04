@@ -105,12 +105,44 @@ class BST
     current
   end
 
-  def successor(z)
-
+  def min(current)
+    current = current.l while current.l
+    current
   end
 
-  def precedessor(z)
+  def max(current)
+    current = current.r while current.r
+    current
+  end
 
+  def successor(z)
+    if z.r
+      return min(z.r)
+    end
+
+    y = z.p
+    x = z
+    while y && y.l.key != x.key
+      x = y
+      y = y.p
+    end
+
+    y
+  end
+
+  def predecessor(z)
+    if z.l
+      return max(z.l)
+    end
+
+    y = z.p
+    x = z
+    while y && y.r.key != x.key
+      x = y
+      y = y.p
+    end
+
+    y
   end
 
   def horizontal_tree_walk
@@ -140,6 +172,7 @@ class BST
         path.push(NullNode.from_node(current))
       end
     end
+    puts "\n"
   end
 
   def inorder_tree_walk(current)
@@ -225,3 +258,11 @@ bst.horizontal_tree_walk
 # puts "\n" * 2
 # puts "Search 35:"
 # bst.print_node(bst.search(35))
+# puts "Min 25:"
+# bst.print_node(bst.min(bst.search(25)))
+# puts "Max 25:"
+# bst.print_node(bst.max(bst.search(25)))
+# puts "Successor 6:"
+# bst.print_node(bst.successor(bst.search(6)))
+# puts "Predecessor 25:"
+# bst.print_node(bst.predecessor(bst.search(25)))
