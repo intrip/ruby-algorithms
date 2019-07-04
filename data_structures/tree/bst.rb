@@ -11,13 +11,18 @@ class Node
     @depth = depth
   end
 
-  def render
-    print key.to_s.ljust(KEY_SPAN)
-    # TODO here need to add a x amount of spaces depending on the depth
+  def render(padding)
+      print pad(padding, key.to_s.ljust(KEY_SPAN))
   end
 
   def null_node?
     false
+  end
+
+  private
+
+  def pad(padding, str)
+    padding + str + padding
   end
 end
 
@@ -42,8 +47,8 @@ class NullNode < Node
     true
   end
 
-  def render
-    print '_'.ljust(KEY_SPAN)
+  def render(padding)
+    print pad(padding, '_'.ljust(KEY_SPAN))
   end
 end
 
@@ -149,16 +154,14 @@ class BST
     path = [root]
     current_depth = 0
 
-    print_padding(current_depth)
-
     while current = path.shift
+      # depth increased: we print the / \ separator
       if current.depth > current_depth
         current_depth += 1
         print_depth_separator(current_depth)
-        print_padding(current_depth)
       end
 
-      current.render
+      current.render(padding(current.depth))
 
       if current.l
         path.push(current.l)
@@ -172,6 +175,7 @@ class BST
         path.push(NullNode.from_node(current))
       end
     end
+
     puts "\n"
   end
 
@@ -205,30 +209,31 @@ class BST
 
   private
 
-  def print_padding(depth)
-    pad_length = base_padding - padding_for(depth)
-    pad_length = 0 if pad_length < 0
-
-    print " " * pad_length
+  def padding(depth, pad = " ")
+    pad * padding_count(depth)
   end
 
-  def base_padding
-    padding_for(max_depth)
-  end
-
-  def padding_for(depth)
-    # 2^depth nodes
-    # each nodes uses KEY_SPAN columns
-    (nodes_count(depth) * KEY_SPAN) / 2
+  def padding_count(depth)
+    # total space occupied by nodes / total nodes / 2
+    ((max_span - span_for(depth)) / nodes_count(depth)) / 2
   end
 
   def print_depth_separator(depth)
     print "\n"
-    print_padding(depth)
     nodes_count(depth).times do |i|
+      print padding(depth)
       print i.even? ? ' / ' : ' \ '
+      print padding(depth)
     end
     print "\n"
+  end
+
+  def max_span
+    span_for(max_depth)
+  end
+
+  def span_for(depth)
+    KEY_SPAN * nodes_count(depth)
   end
 
   def nodes_count(depth)
