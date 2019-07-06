@@ -4,13 +4,13 @@ The lower bound for Comparison based sorting algorithm (Merge Sort, Heap Sort, Q
 
 Counting sort is a linear time sorting algorithm that sort in O(n+k) time when elements are in range from 1 to k.
 
-What if the elements are in range from 1 to n2? 
+What if the elements are in range from 1 to n2?
 We can’t use counting sort because counting sort will take O(n2) which is worse than comparison based sorting algorithms. Can we sort such an array in linear time?
 Radix Sort is the answer. The idea of Radix Sort is to do digit by digit sort starting from least significant digit to most significant digit. Radix sort uses counting sort as a subroutine to sort.
 
 The Radix Sort Algorithm
 1) Do following for each digit i where i varies from least significant digit to the most significant digit.
-	a) Sort input array using counting sort (or any stable sort) according to the i’th digit.
+        a) Sort input array using counting sort (or any stable sort) according to the i’th digit.
 
 Example:
 Original, unsorted list:
@@ -31,49 +31,46 @@ What if we make value of b larger?. What should be the value of b to make the ti
 
 Is Radix Sort preferable to Comparison based sorting algorithms like Quick-Sort?
 If we have log2n bits for every digit, the running time of Radix appears to be better than Quick Sort for a wide range of input numbers. The constant factors hidden in asymptotic notation are higher for Radix Sort and Quick-Sort uses hardware caches more effectively. Also, Radix sort uses counting sort as a subroutine and counting sort takes extra space to sort numbers.
-
-Implementation of Radix Sort
-Following is a simple C++ implementation of Radix Sort. For simplicity, the value of d is assumed to be 10. We recommend you to see Counting Sort for details of countSort() function in below code.
 =end
 
 def counting_sort_radix(arr, exp)
-	# create empty count array
-	count = Array.new(10,0)
-	res = Array.new(arr.length)
-	len = arr.length()-1
+  # create empty count array
+  count = Array.new(10,0)
+  res = Array.new(arr.length)
+  len = arr.length()-1
 
-	# calculate count for each item
-	for i in 0..len	
-		normalized_n = arr[i]/exp
-		count[normalized_n%10]+=1
-	end
+  # calculate count for each item
+  for i in 0..len
+    normalized_n = arr[i]/exp
+    count[normalized_n%10]+=1
+  end
 
-	# sum previous values
-	for i in 1..9
-		count[i]+=count[i-1]
-	end
-	 
-	# create new res
-	for i in 0..len
-		normalized_n = arr[i]/exp
-		res[count[normalized_n%10]-1] = arr[i]
-		count[normalized_n%10] -=1
-	end
+  # sum previous values
+  for i in 1..9
+    count[i]+=count[i-1]
+  end
 
-	for i in 0..len
-		arr[i]=res[i]
-	end
+  # create new res
+  for i in 0..len
+    normalized_n = arr[i]/exp
+    res[count[normalized_n%10]-1] = arr[i]
+    count[normalized_n%10] -=1
+  end
+
+  for i in 0..len
+    arr[i]=res[i]
+  end
 end
 
 def radix_sort(arr)
-	max = arr.max
+  max = arr.max
 
-	exp=1
-	while(max/exp > 0) do
-		counting_sort_radix(arr,exp)
-		exp *=10
-	end
-	arr
+  exp=1
+  while(max/exp > 0) do
+    counting_sort_radix(arr,exp)
+    exp *=10
+  end
+  arr
 end
 
 arr = [32, 41, 59, 1, 22, 134]
