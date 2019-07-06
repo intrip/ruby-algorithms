@@ -12,7 +12,7 @@ class Node
   end
 
   def render(padding)
-      print pad(padding, key.to_s.ljust(KEY_SPAN))
+    print pad(*padding, key.to_s.rjust(KEY_SPAN))
   end
 
   def null_node?
@@ -21,8 +21,8 @@ class Node
 
   private
 
-  def pad(padding, str)
-    padding + str + padding
+  def pad(lpad, rpad, str)
+    lpad + str + rpad
   end
 end
 
@@ -48,7 +48,7 @@ class NullNode < Node
   end
 
   def render(padding)
-    print pad(padding, '_'.ljust(KEY_SPAN))
+    print pad(*padding, ' * ')
   end
 end
 
@@ -94,6 +94,39 @@ class BST
     end
 
     z
+  end
+
+  def delete(z)
+    if z.l == nil
+      transplant(z, z.r)
+    elsif z.r == nil
+      transplant(z, z.l)
+    else
+      # here we check if successor is z.r and depending on that we transplant
+      succ = successor(z)
+      if succ.key != z.r
+        # TODO need to swap succ with z.r and fix the tree
+      end
+      transplant(z,z.r)
+      z.r.l = z.l
+      z.l.p = z.r
+    end
+  end
+
+  # replace the subtree rooted at node u with
+  # the subtree rooted ad the node v
+  def transplant(u,v = nil)
+    self.root = v if u.p == nil
+
+    v.depth = u.depth if v
+
+    if u.p.l&.key == u.key
+      u.p.l = v
+    else
+      u.p.r = v
+    end
+
+    v.p = u.p if v
   end
 
   def search(key)
@@ -210,20 +243,27 @@ class BST
   private
 
   def padding(depth, pad = " ")
-    pad * padding_count(depth)
+    padding_count(depth).map do |c|
+      pad * c
+    end
   end
 
   def padding_count(depth)
     # total space occupied by nodes / total nodes / 2
-    ((max_span - span_for(depth)) / nodes_count(depth)) / 2
+    padding = (max_span - span_for(depth)) / nodes_count(depth)
+    rem = padding % 2
+    lpad = padding / 2
+    # we add the rounding reminder to the right node if present
+    rpad = rem.zero? ? lpad : lpad + rem
+    [lpad, rpad]
   end
 
   def print_depth_separator(depth)
     print "\n"
     nodes_count(depth).times do |i|
-      print padding(depth)
+      print padding(depth).first
       print i.even? ? ' / ' : ' \ '
-      print padding(depth)
+      print padding(depth).last
     end
     print "\n"
   end
@@ -271,3 +311,6 @@ bst.horizontal_tree_walk
 # bst.print_node(bst.successor(bst.search(6)))
 # puts "Predecessor 25:"
 # bst.print_node(bst.predecessor(bst.search(25)))
+puts "Delete node: 15"
+bst.delete(bst.search(15))
+bst.horizontal_tree_walk
