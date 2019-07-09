@@ -19,6 +19,12 @@ class Node
     false
   end
 
+  def ==(other = nil)
+    return false unless other
+
+    key == other.key
+  end
+
   private
 
   def pad(lpad, rpad, str)
@@ -88,12 +94,49 @@ class BST
       end
     end
 
-    # set tree max depth: used for horizontal_tree_walk
+    # set tree max depth
     if z.depth > max_depth
       @max_depth = z.depth
     end
 
     z
+  end
+
+  def insert_r(key, y = nil)
+    y ||= root
+
+    # find next node path
+    if y
+      if key > y.key
+        x = y.r
+      else
+        x = y.l
+      end
+    else
+      x = y
+    end
+
+    if x
+      # navigate towards the node to insert
+      insert_r(key, x)
+    else
+      #tail: insert the node at his postion
+      z = Node.new(key, nil, nil, nil, nil)
+      z.p = y
+      z.depth = y.depth + 1
+      if z.key > y.key
+        y.r = z
+      else
+        y.l = z
+      end
+
+      # set tree max depth
+      if z.depth > max_depth
+        @max_depth = z.depth
+      end
+
+      z
+    end
   end
 
   def delete(z)
@@ -102,28 +145,30 @@ class BST
     elsif z.r == nil
       transplant(z, z.l)
     else
+      y = min(z.r)
       # here we check if successor is z.r and depending on that we transplant
-      succ = successor(z)
-      if succ.key != z.r
-        # TODO need to swap succ with z.r and fix the tree
+      if y.p != z
+        transplant(y,y.r)
+        y.r = z.r
+        y.r.p = y
       end
-      transplant(z,z.r)
-      z.r.l = z.l
-      z.l.p = z.r
+      transplant(z,y)
+      y.l = z.l
+      z.l.p = y
     end
   end
 
   # replace the subtree rooted at node u with
   # the subtree rooted ad the node v
-  def transplant(u,v = nil)
+  def transplant(u, v = nil)
     self.root = v if u.p == nil
 
-    v.depth = u.depth if v
+    update_depth(v, u.depth)
 
-    if u.p.l&.key == u.key
+    if u.p&.l == u
       u.p.l = v
     else
-      u.p.r = v
+      u.p.r = v if u.p&.r
     end
 
     v.p = u.p if v
@@ -160,7 +205,7 @@ class BST
 
     y = z.p
     x = z
-    while y && y.l.key != x.key
+    while y && y.l != x
       x = y
       y = y.p
     end
@@ -175,7 +220,7 @@ class BST
 
     y = z.p
     x = z
-    while y && y.r.key != x.key
+    while y && y.r != x
       x = y
       y = y.p
     end
@@ -241,6 +286,16 @@ class BST
   end
 
   private
+
+  def update_depth(node, depth)
+    node.depth = depth
+    if node.l
+      update_depth(node.l, depth + 1)
+    end
+    if node.r
+      update_depth(node.r, depth + 1)
+    end
+  end
 
   def padding(depth, pad = " ")
     padding_count(depth).map do |c|
@@ -311,6 +366,6 @@ bst.horizontal_tree_walk
 # bst.print_node(bst.successor(bst.search(6)))
 # puts "Predecessor 25:"
 # bst.print_node(bst.predecessor(bst.search(25)))
-puts "Delete node: 15"
-bst.delete(bst.search(15))
-bst.horizontal_tree_walk
+# puts "Delete node: 25"
+# bst.delete(bst.search(25))
+# bst.horizontal_tree_walk
