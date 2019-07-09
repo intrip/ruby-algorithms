@@ -59,8 +59,7 @@ class NullNode < Node
 end
 
 class BST
-  attr_accessor :root
-  attr_reader :max_depth
+  attr_reader :max_depth, :root
 
   def initialize(root = nil)
     @root = root
@@ -68,13 +67,12 @@ class BST
   end
 
   def insert(key)
-    z = Node.new(key, nil, nil, nil, nil)
     y = nil
     x = root
 
     while x != nil
       y = x
-      if z.key < x.key
+      if key < x.key
         x = x.l
       else
         x = x.r
@@ -85,8 +83,7 @@ class BST
       x = root
       x.depth = 0
     else
-      z.p = y
-      z.depth = y.depth + 1
+      z = Node.new(key, y, nil, nil, y.depth + 1)
       if z.key < y.key
         y.l = z
       else
@@ -102,32 +99,28 @@ class BST
     z
   end
 
-  def insert_r(key, y = nil)
-    y ||= root
+  def insert_r(k)
+    unless root
+      @root = Node.new(k, nil, nil, nil, nil)
+    else
+      insert_r_sub(nil, root, k)
+    end
+  end
 
-    # find next node path
-    if y
-      if key > y.key
-        x = y.r
+  def insert_r_sub(p, x, k)
+    if x
+      if k > x.key
+        insert_r_sub(x, x.r, k)
       else
-        x = y.l
+        insert_r_sub(x, x.l, k)
       end
     else
-      x = y
-    end
-
-    if x
-      # navigate towards the node to insert
-      insert_r(key, x)
-    else
       #tail: insert the node at his postion
-      z = Node.new(key, nil, nil, nil, nil)
-      z.p = y
-      z.depth = y.depth + 1
-      if z.key > y.key
-        y.r = z
+      z = Node.new(k, p, nil, nil, p.depth + 1)
+      if z.key > p.key
+        p.r = z
       else
-        y.l = z
+        p.l = z
       end
 
       # set tree max depth
@@ -145,6 +138,7 @@ class BST
     elsif z.r == nil
       transplant(z, z.l)
     else
+      # here we find the succ we could also find the pred of z.l and tweak the code below to set the nodes correctly
       y = min(z.r)
       # here we check if successor is z.r and depending on that we transplant
       if y.p != z
@@ -161,7 +155,7 @@ class BST
   # replace the subtree rooted at node u with
   # the subtree rooted ad the node v
   def transplant(u, v = nil)
-    self.root = v if u.p == nil
+    @root = v if u.p == nil
 
     update_depth(v, u.depth)
 
@@ -340,11 +334,10 @@ bst = BST.new(RootNode.new(25))
 bst.insert(5)
 bst.insert(2)
 bst.insert(6)
-bst.insert(30)
+bst.insert_r(30)
 bst.insert(35)
 bst.insert(15)
 bst.insert(11)
-bst.root
 
 puts "Horizontal tree walk:"
 bst.horizontal_tree_walk
