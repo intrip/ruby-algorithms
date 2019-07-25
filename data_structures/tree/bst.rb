@@ -42,7 +42,7 @@ class RootNode < Node
   end
 end
 
-class NullNode < Node
+class EmptyNode < Node
   class << self
     def from_node(node)
       self.new(nil, node, nil, nil, node.depth + 1)
@@ -80,8 +80,8 @@ class BST
     end
 
     if y == nil
-      x = root
-      x.depth = 0
+      z = Node.new(key, nil, nil, nil, 0)
+      @root = z
     else
       z = Node.new(key, y, nil, nil, y.depth + 1)
       if z.key < y.key
@@ -238,13 +238,13 @@ class BST
       if current.l
         path.push(current.l)
       elsif current.depth < max_depth
-        path.push(NullNode.from_node(current))
+        path.push(EmptyNode.from_node(current))
       end
 
       if current.r
         path.push(current.r)
       elsif current.depth < max_depth
-        path.push(NullNode.from_node(current))
+        path.push(EmptyNode.from_node(current))
       end
     end
 
