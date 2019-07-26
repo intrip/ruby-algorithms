@@ -139,7 +139,7 @@ class RBTree
     @nil_node = NilNode.new
     @tree_height = 0
     @nodes_count = 0
-    @leafs = []
+    @highest_leafs = []
   end
 
   def insert(key)
@@ -171,7 +171,7 @@ class RBTree
     rb_insert_fixup(z)
     @nodes_count += 1
     if z.depth == tree_height
-      @leafs << z
+      @highest_leafs << z
     end
 
     update_tree_height(z)
@@ -505,10 +505,10 @@ class RBTree
   end
 
   def update_tree_height(node)
-    @tree_height = @leafs.map(&:depth).max # TODO optimize
+    @tree_height = @highest_leafs.map(&:depth).max # TODO optimize
     if node.depth > tree_height
       puts "Increased tree height to #{node.depth}"
-      @leafs = [node]
+      @highest_leafs = [node]
       @tree_height = node.depth
     end
   end
