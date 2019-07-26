@@ -129,7 +129,7 @@ end
 
 class RBTree
   attr_reader :root, :nil_node
-  attr_accessor :max_depth
+  attr_accessor :tree_height
 
   def initialize(root = nil)
     if root
@@ -137,13 +137,15 @@ class RBTree
       @root.p = nil_node
     end
     @nil_node = NilNode.new
-    @max_depth = 0
+    @tree_height = 0
     @nodes_count = 0
+    @leafs = []
   end
 
   def insert(key)
     y = nil_node
     x = root
+    puts "Insert #{key}"
 
     while x && !x.nil_node?
       y = x
@@ -166,13 +168,13 @@ class RBTree
       end
     end
 
-    # set tree max depth
-    if z.depth > max_depth
-      @max_depth = z.depth
-    end
-
     rb_insert_fixup(z)
     @nodes_count += 1
+    if z.depth == tree_height
+      @leafs << z
+    end
+
+    update_tree_height(z)
     z
   end
 
@@ -239,14 +241,16 @@ class RBTree
   #
   def rotate_l(z)
     y = z.r
+    puts "Rotate L: #{z.as_str}"
 
     return false unless y
 
     y_new_depth = z.depth
-    # reduce max_depth to force recaulculation when rotations would reduce the
+    # reduce tree_height to force recaulculation when rotations would reduce the
     # tree height
-    if z.r.depth == ((max_depth - 1) || max_depth)
-      @max_depth = z.depth
+    if z.depth == (tree_height - 2)
+      puts "Reduce height to #{z.depth}"
+      @tree_height = z.depth
     end
 
     # set parent of y
@@ -293,14 +297,16 @@ class RBTree
   #
   def rotate_r(z)
     y = z.l
+    puts "Rotate R: #{z.as_str}"
 
     return false unless y
 
     y_new_depth = z.depth
-    # reduce max_depth to force recaulculation when rotations would reduce the
+    # reduce tree_height to force recaulculation when rotations would reduce the
     # tree height
-    if z.l.depth == ((max_depth - 1) || max_depth)
-      @max_depth = z.depth
+    if z.depth == (tree_height - 2)
+      puts "Reduce height to #{z.depth}"
+      @tree_height = z.depth
     end
 
 
@@ -434,13 +440,13 @@ class RBTree
 
       if current.l && !current.l.nil_node?
         path.push(current.l)
-      elsif current.depth < max_depth
+      elsif current.depth < tree_height
         path.push(EmptyNode.from_node(current, nil_node))
       end
 
       if current.r && !current.r.nil_node?
         path.push(current.r)
-      elsif current.depth < max_depth
+      elsif current.depth < tree_height
         path.push(EmptyNode.from_node(current, nil_node))
       end
     end
@@ -478,25 +484,32 @@ class RBTree
 
   def balance_info
     max_height =(2 * Math.log(@nodes_count + 1,2)).round
-    puts "Total nodes: #{@nodes_count}, Height: #{max_depth}, Max Height: #{max_height}, Balanced? #{max_height >= max_depth}"
+    puts "Total nodes: #{@nodes_count}, Height: #{tree_height}, Max Height: #{max_height}, Balanced? #{max_height >= tree_height}"
   end
 
   private
 
   # updates a node and his childrens depth
   def update_depth(node, depth)
+    puts "Update depth, #{node.as_str} dept: #{depth}"
     node.depth = depth
 
-    # keep max_depth up to date
-    if depth > max_depth
-      @max_depth = depth
-    end
+    update_tree_height(node)
 
     if node.l && !node.l.nil_node?
       update_depth(node.l, depth + 1)
     end
     if node.r && !node.r.nil_node?
       update_depth(node.r, depth + 1)
+    end
+  end
+
+  def update_tree_height(node)
+    @tree_height = @leafs.map(&:depth).max # TODO optimize
+    if node.depth > tree_height
+      puts "Increased tree height to #{node.depth}"
+      @leafs = [node]
+      @tree_height = node.depth
     end
   end
 
@@ -527,7 +540,7 @@ class RBTree
   end
 
   def max_span
-    span_for(max_depth)
+    span_for(tree_height)
   end
 
   def span_for(depth)
@@ -540,26 +553,28 @@ class RBTree
 end
 
 rbt = RBTree.new
-25.times do |i|
-  rbt.insert(rand(100))
+# [3,2,1,4,7,8,9,13,22].each do |i|
+keys = []
+20.times do |i|
+  k = rand(100)
+  if keys.include?(k)
+    next
+  end
+  keys << k
+  rbt.insert(k)
   # rbt.insert(i)
-  puts "\nTree:\n"
-  rbt.horizontal_tree_walk
   puts rbt.balance_info
-  # readline
+  rbt.horizontal_tree_walk
+  readline
 end
 
 
-rbt.insert(1)
-rbt.insert(2)
-rbt.insert(3)
-
 # TODO go from here
-# fix the rotation depth update because decrease too much
+# refactor and optimize update_depth
 # do the delete
 
-rbt.horizontal_tree_walk
-puts rbt.max_depth
+# rbt.horizontal_tree_walk
+# puts rbt.balance_info
 # puts "\n"
 # puts "left rotate root (25)"
 # rbt.rotate_l(rbt.root)
