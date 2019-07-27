@@ -1,4 +1,3 @@
-require 'byebug'
 require 'readline'
 
 # Red back tree
@@ -24,6 +23,7 @@ class String
   end
 end
 
+# the width of each printed node key
 KEY_SPAN = 3
 class Node
   attr_reader :key
@@ -61,14 +61,12 @@ class Node
   end
 
   def inspect
-    "#{key}@#{c}:#{p&.key},#{l&.key},#{r&.key};#{depth}"
+    "#{key}@#{c}:#{p&.key},#{l&.key},#{r&.key};#{depth}."
   end
 
   private
 
   def key_s
-    # debuggin info
-    # key.to_s + ".#{depth}"
     key.to_s
   end
 
@@ -82,18 +80,7 @@ class Node
   end
 end
 
-class RootNode < Node
-  def initialize(key, p = nil, l = nil, r = nil, c = nil, depth= nil)
-    @key = key
-    @p = p
-    @l = l
-    @r = r
-    @c = c
-    @depth = 0
-  end
-end
-
-# Every leaf node is nil node
+# Every leaf node is a nil node in a RBTree, also the root.p
 class NilNode < Node
   def initialize(*args)
     super(nil, nil, nil, nil, nil, nil)
@@ -103,6 +90,7 @@ class NilNode < Node
     true
   end
 
+  # nil nodes are always black
   def c
     'b'
   end
@@ -130,23 +118,28 @@ end
 class RBTree
   attr_reader :root, :nil_node
   attr_accessor :tree_height
+  attr_reader :debug
 
-  def initialize(root = nil)
+  def initialize(root = nil, debug = false)
+    @nil_node = NilNode.new
     if root
       @root = root
       @root.p = nil_node
     end
-    @nil_node = NilNode.new
     @tree_height = 0
     @nodes_count = 0
     @highest_leafs = []
+    @debug = debug
   end
 
+  # insert a node with key in the tree
   def insert(key)
     y = nil_node
     x = root
-    puts "Insert #{key}"
 
+    puts_debug "Insert #{key}"
+
+    # find node parent
     while x && !x.nil_node?
       y = x
       if key < x.key
@@ -156,6 +149,7 @@ class RBTree
       end
     end
 
+    # create node and set parent
     if y.nil_node?
       z = Node.new(key, nil_node, nil_node, nil_node, 'r', 0)
       @root = z
@@ -173,30 +167,35 @@ class RBTree
     if z.depth == tree_height
       @highest_leafs << z
     end
-
     update_tree_height(z)
+
     z
   end
 
+  # fix the red black violations: either rule 4 or 2
   def rb_insert_fixup(z)
     while z.p&.c == 'r'
       if z.p == z.p.p.l
         y = z.p.p.r
+        # case 1: uncle red
         if y.c == 'r'
           z.p.c = 'b'
           y.c = 'b'
           z.p.p.c = 'r'
           z = z.p.p
         else
+          # case2: uncle black and right child
           if z == z.p.r
             z = z.p
             rotate_l(z)
           end
 
+          # case3: uncle black and left child
           z.p.c = 'b'
           z.p.p.c = 'r'
           rotate_r(z.p.p)
         end
+      # same as the if with l and r swapped
       else
         y = z.p.p.l
         if y.c == 'r'
@@ -217,6 +216,7 @@ class RBTree
       end
     end
 
+    # root is always black to fix rule 2
     root.c = 'b'
   end
 
@@ -241,9 +241,9 @@ class RBTree
   #
   def rotate_l(z)
     y = z.r
-    puts "Rotate L: #{z.as_str}"
-
     return false unless y
+
+    puts_debug "Rotate L: #{z.as_str}"
 
     y_new_depth = z.depth
     # reduce tree_height to force recaulculation when rotations would reduce the
@@ -297,9 +297,9 @@ class RBTree
   #
   def rotate_r(z)
     y = z.l
-    puts "Rotate R: #{z.as_str}"
-
     return false unless y
+
+    puts_debug "Rotate R: #{z.as_str}"
 
     y_new_depth = z.depth
     # reduce tree_height to force recaulculation when rotations would reduce the
@@ -308,7 +308,6 @@ class RBTree
       puts "Reduce height to #{z.depth}"
       @tree_height = z.depth
     end
-
 
     # set parent of y
     y.p = z.p
@@ -333,41 +332,9 @@ class RBTree
     z
   end
 
-  # def delete(z)
-  #   if z.l == nil
-  #     transplant(z, z.r)
-  #   elsif z.r == nil
-  #     transplant(z, z.l)
-  #   else
-  #     # here we find the succ we could also find the pred of z.l and tweak the code below to set the nodes correctly
-  #     y = min(z.r)
-  #     # here we check if successor is z.r and depending on that we transplant
-  #     if y.p != z
-  #       transplant(y,y.r)
-  #       y.r = z.r
-  #       y.r.p = y
-  #     end
-  #     transplant(z,y)
-  #     y.l = z.l
-  #     z.l.p = y
-  #   end
-  # end
-
-  # replace the subtree rooted at node u with
-  # the subtree rooted ad the node v
-  # def transplant(u, v = nil)
-  #   @root = v if u.p == nil
-
-  #   update_depth(v, u.depth)
-
-  #   if u.p&.l == u
-  #     u.p.l = v
-  #   else
-  #     u.p.r = v if u.p&.r
-  #   end
-
-  #   v.p = u.p if v
-  # end
+  def delete(z)
+    # TODO
+  end
 
   def search(key)
     current = root
@@ -423,6 +390,7 @@ class RBTree
     y
   end
 
+  # pretty prints the tree
   def horizontal_tree_walk
     path = [root]
     current_depth = 0
@@ -478,20 +446,24 @@ class RBTree
     print_node(current)
   end
 
-  def print_node(node)
-    puts "#{node.as_str} #{ '(root)' if node.key == root.key }"
-  end
-
   def balance_info
-    max_height =(2 * Math.log(@nodes_count + 1,2)).round
+    max_height =(2 * Math.log(@nodes_count + 1, 2)).round
     puts "Total nodes: #{@nodes_count}, Height: #{tree_height}, Max Height: #{max_height}, Balanced? #{max_height >= tree_height}"
   end
 
   private
 
-  # updates a node and his childrens depth
+  def print_node(node)
+    puts "#{node.as_str} #{ '(root)' if node.key == root.key }"
+  end
+
+  def puts_debug(txt)
+    puts txt if debug
+  end
+
+  # updates a node and his childrens depth; also recalculates tree_height
   def update_depth(node, depth)
-    puts "Update depth, #{node.as_str} dept: #{depth}"
+    puts_debug "Update depth, #{node.as_str} dept: #{depth}"
     node.depth = depth
 
     update_tree_height(node)
@@ -505,9 +477,9 @@ class RBTree
   end
 
   def update_tree_height(node)
-    @tree_height = @highest_leafs.map(&:depth).max # TODO optimize
+    @tree_height = @highest_leafs.map(&:depth).max
     if node.depth > tree_height
-      puts "Increased tree height to #{node.depth}"
+      puts_debug "Increased tree height to #{node.depth}"
       @highest_leafs = [node]
       @tree_height = node.depth
     end
@@ -554,15 +526,15 @@ end
 
 rbt = RBTree.new
 # [3,2,1,4,7,8,9,13,22].each do |i|
-keys = []
-20.times do |i|
-  k = rand(100)
-  if keys.include?(k)
-    next
-  end
-  keys << k
-  rbt.insert(k)
-  # rbt.insert(i)
+# keys = []
+25.times do |i|
+  # k = rand(100)
+  # if keys.include?(k)
+  #   next
+  # end
+  # keys << k
+  # rbt.insert(k)
+  rbt.insert(i)
   puts rbt.balance_info
   rbt.horizontal_tree_walk
   readline
@@ -570,7 +542,6 @@ end
 
 
 # TODO go from here
-# refactor and optimize update_depth
 # do the delete
 
 # rbt.horizontal_tree_walk
