@@ -27,15 +27,15 @@ end
 KEY_SPAN = 3
 class Node
   attr_reader :key
-  attr_accessor :p, :l, :r, :c, :depth
+  attr_accessor :p, :l, :r, :c, :height
 
-  def initialize(key, p, l, r, c, depth)
+  def initialize(key, p, l, r, c, height)
     @key = key
     @p = p
     @l = l
     @r = r
     @c = c
-    @depth = depth
+    @height = height
   end
 
   def render(padding)
@@ -61,7 +61,7 @@ class Node
   end
 
   def inspect
-    "#{key}@#{c}:#{p&.key},#{l&.key},#{r&.key};#{depth}."
+    "#{key}@#{c}:#{p&.key},#{l&.key},#{r&.key};#{height}."
   end
 
   private
@@ -106,7 +106,7 @@ class EmptyNode < Node
   class << self
     def from_node(node, nil_node)
       # empty node has no color
-      self.new(nil, node, nil_node, nil_node, '', node.depth + 1)
+      self.new(nil, node, nil_node, nil_node, '', node.height + 1)
     end
   end
 
@@ -154,7 +154,7 @@ class RBTree
       z = Node.new(key, nil_node, nil_node, nil_node, 'r', 0)
       @root = z
     else
-      z = Node.new(key, y, nil_node, nil_node, 'r', y.depth + 1)
+      z = Node.new(key, y, nil_node, nil_node, 'r', y.height + 1)
       if z.key < y.key
         y.l = z
       else
@@ -164,7 +164,7 @@ class RBTree
 
     rb_insert_fixup(z)
     @nodes_count += 1
-    if z.depth == tree_height
+    if z.height == tree_height
       @highest_leafs << z
     end
     update_tree_height(z)
@@ -245,12 +245,11 @@ class RBTree
 
     puts_debug "Rotate L: #{z.as_str}"
 
-    y_new_depth = z.depth
-    # reduce tree_height to force recaulculation when rotations would reduce the
-    # tree height
-    if z.depth == (tree_height - 2)
-      puts "Reduce height to #{z.depth}"
-      @tree_height = z.depth
+    y_new_height = z.height
+    # reduce tree_height to force recaulculation if rotation could reduce the tree_height
+    if z.height == (tree_height - 2)
+      puts "Reduce height to #{z.height}"
+      @tree_height = z.height
     end
 
     # set parent of y
@@ -271,7 +270,7 @@ class RBTree
     y.l = z
     z.p = y
 
-    update_depth(y, y_new_depth)
+    update_height(y, y_new_height)
 
     z
   end
@@ -301,12 +300,11 @@ class RBTree
 
     puts_debug "Rotate R: #{z.as_str}"
 
-    y_new_depth = z.depth
-    # reduce tree_height to force recaulculation when rotations would reduce the
-    # tree height
-    if z.depth == (tree_height - 2)
-      puts "Reduce height to #{z.depth}"
-      @tree_height = z.depth
+    y_new_height = z.height
+    # reduce tree_height to force recaulculation if rotation could reduce the tree_height
+    if z.height == (tree_height - 2)
+      puts "Reduce height to #{z.height}"
+      @tree_height = z.height
     end
 
     # set parent of y
@@ -327,7 +325,7 @@ class RBTree
     y.r = z
     z.p = y
 
-    update_depth(y, y_new_depth)
+    update_height(y, y_new_height)
 
     z
   end
@@ -393,28 +391,28 @@ class RBTree
   # pretty prints the tree
   def horizontal_tree_walk
     path = [root]
-    current_depth = 0
+    current_height = 0
 
     while current = path.shift
       next if current.nil_node?
 
-      # depth increased: we print the / \ separator
-      if current.depth > current_depth
-        current_depth += 1
-        print_depth_separator(current_depth)
+      # height increased: we print the / \ separator
+      if current.height > current_height
+        current_height += 1
+        print_height_separator(current_height)
       end
 
-      current.render(padding(current.depth))
+      current.render(padding(current.height))
 
-      if current.l && !current.l.nil_node?
+      if !current.l.nil_node?
         path.push(current.l)
-      elsif current.depth < tree_height
+      elsif current.height < tree_height
         path.push(EmptyNode.from_node(current, nil_node))
       end
 
-      if current.r && !current.r.nil_node?
+      if !current.r.nil_node?
         path.push(current.r)
-      elsif current.depth < tree_height
+      elsif current.height < tree_height
         path.push(EmptyNode.from_node(current, nil_node))
       end
     end
@@ -434,15 +432,15 @@ class RBTree
     return unless current
 
     print_node(current)
-    inorder_tree_walk(current.l)
-    inorder_tree_walk(current.r)
+    preorder_tree_walk(current.l)
+    preorder_tree_walk(current.r)
   end
 
   def postorder_tree_walk(current)
     return unless current
 
-    inorder_tree_walk(current.l)
-    inorder_tree_walk(current.r)
+    postorder_tree_walk(current.l)
+    postorder_tree_walk(current.r)
     print_node(current)
   end
 
@@ -461,83 +459,87 @@ class RBTree
     puts txt if debug
   end
 
-  # updates a node and his childrens depth; also recalculates tree_height
-  def update_depth(node, depth)
-    puts_debug "Update depth, #{node.as_str} dept: #{depth}"
-    node.depth = depth
+  # updates a node and his childrens height; also recalculates tree_height
+  def update_height(node, height)
+    puts_debug "Update height, #{node.as_str} dept: #{height}"
+
+    node.height = height
 
     update_tree_height(node)
 
-    if node.l && !node.l.nil_node?
-      update_depth(node.l, depth + 1)
+    if !node.l.nil_node?
+      update_height(node.l, height + 1)
     end
-    if node.r && !node.r.nil_node?
-      update_depth(node.r, depth + 1)
+    if !node.r.nil_node?
+      update_height(node.r, height + 1)
     end
   end
 
   def update_tree_height(node)
-    @tree_height = @highest_leafs.map(&:depth).max
-    if node.depth > tree_height
-      puts_debug "Increased tree height to #{node.depth}"
+    @tree_height = @highest_leafs.map(&:height).max
+    if node.height > tree_height
+      puts_debug "Increased tree height to #{node.height}"
+
       @highest_leafs = [node]
-      @tree_height = node.depth
+      @tree_height = node.height
     end
   end
 
-  def padding(depth, pad = " ")
-    padding_count(depth).map do |c|
+  def padding(height, pad = " ")
+    paddings(height).map do |c|
       pad * c
     end
   end
 
-  def padding_count(depth)
-    # total space occupied by nodes / total nodes / 2
-    padding = (max_span - span_for(depth)) / nodes_count(depth)
+  def paddings(height)
+    # total space occupied by nodes / total nodes
+    padding = (max_span - span_for(height)) / nodes_count(height)
+
     rem = padding % 2
     lpad = padding / 2
     # we add the rounding reminder to the right node if present
     rpad = rem.zero? ? lpad : lpad + rem
-    [lpad, rpad]
-  end
 
-  def print_depth_separator(depth)
-    print "\n"
-    nodes_count(depth).times do |i|
-      print padding(depth).first
-      print i.even? ? ' / ' : ' \ '
-      print padding(depth).last
-    end
-    print "\n"
+    [lpad, rpad]
   end
 
   def max_span
     span_for(tree_height)
   end
 
-  def span_for(depth)
-    KEY_SPAN * nodes_count(depth)
+  def span_for(height)
+    KEY_SPAN * nodes_count(height)
   end
 
-  def nodes_count(depth)
-    (2 ** depth)
+  def nodes_count(height)
+    (2 ** height)
+  end
+
+  def print_height_separator(height)
+    print "\n"
+    nodes_count(height).times do |i|
+      print padding(height).first
+      print i.even? ? ' / ' : ' \ '
+      print padding(height).last
+    end
+    print "\n"
   end
 end
 
 rbt = RBTree.new
 # [3,2,1,4,7,8,9,13,22].each do |i|
-# keys = []
-25.times do |i|
-  # k = rand(100)
-  # if keys.include?(k)
-  #   next
-  # end
-  # keys << k
+keys = []
+5.times do |i|
+  k = rand(100)
+  if keys.include?(k)
+    next
+  end
+  keys << k
   # rbt.insert(k)
   rbt.insert(i)
   puts rbt.balance_info
   rbt.horizontal_tree_walk
-  readline
+  # readline
 end
 
 
@@ -559,6 +561,6 @@ end
 # puts "\nInorder tree walk:"
 # rbt.inorder_tree_walk(rbt.root)
 # puts "Preorder tree walk:"
-# bst.preorder_tree_walk(bst.root)
-# puts "Postorder tree walk:"
-# bst.postorder_tree_walk(bst.root)
+# rbt.preorder_tree_walk(rbt.root)
+puts "Postorder tree walk:"
+rbt.postorder_tree_walk(rbt.root)

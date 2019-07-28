@@ -263,15 +263,15 @@ class BST
     return unless current
 
     print_node(current)
-    inorder_tree_walk(current.l)
-    inorder_tree_walk(current.r)
+    preorder_tree_walk(current.l)
+    preorder_tree_walk(current.r)
   end
 
   def postorder_tree_walk(current)
     return unless current
 
-    inorder_tree_walk(current.l)
-    inorder_tree_walk(current.r)
+    postorder_tree_walk(current.l)
+    postorder_tree_walk(current.r)
     print_node(current)
   end
 
