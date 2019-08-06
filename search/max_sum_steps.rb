@@ -44,20 +44,18 @@
 # N is an integer within the range [2..100,000];
 # each element of array A is an integer within the range [−10,000..10,000].
 
-MAX_STEP = 6
-
 def solution(a)
-  res=0
-  i=0
+  res = 0
+  i = 0
 
   first_neg_idx = nil
-  neg_c = 0
+  neg_count = 0
 
   while i < a.length
     if a[i] >= 0
       if first_neg_idx
         # we encountered neg numbers, need to update res calculaing max_neg_steps
-        first_neg_idx, neg_c, end_idx, i, res = max_neg_steps(a, first_neg_idx, neg_c, res)
+        first_neg_idx, neg_count, end_idx, i, res = max_neg_steps(a, first_neg_idx, neg_count, res)
       else
         res += a[i]
       end
@@ -66,10 +64,10 @@ def solution(a)
 
       if i == a.length - 1
         # reached the end of the array: calculate the ending result
-        first_neg_idx, neg_c, end_idx, i, res = max_neg_steps(a, first_neg_idx, neg_c, res)
+        first_neg_idx, neg_count, end_idx, i, res = max_neg_steps(a, first_neg_idx, neg_count, res)
       end
 
-      neg_c += 1
+      neg_count += 1
     end
 
     i += 1
@@ -78,49 +76,28 @@ def solution(a)
   res
 end
 
-def max_neg_steps(a, first_neg_idx, neg_c, res)
-  end_idx = first_neg_idx + neg_c
+def max_neg_steps(a, first_neg_idx, neg_count, res)
+  end_idx = first_neg_idx + neg_count
   i = end_idx
   res = max_sub(a, first_neg_idx - 1, end_idx, res)
   # reset
   first_neg_idx = nil
-  neg_c = 0
+  neg_count = 0
 
-  [first_neg_idx, neg_c, end_idx, i, res]
+  [first_neg_idx, neg_count, end_idx, i, res]
 end
 
-def max_sub(a, start_i, end_idx, max)
-  paths = [[start_i, max]]
-  all_steps = steps(a, paths, end_idx)
-  all_steps.map(&:last).max
-end
+MAX_STEP = 6
 
-def steps(a, paths, end_idx)
-  new_path = []
-  done = true
-
-  paths.each do |path|
-    start = path[0]
-    tmax = path[1]
-
-    # TODO just set max = max(max, tmax) and skip this instead
-    # we already completed the computation of this path
-    if end_idx == start
-      new_path << path
-    elsif (end_idx - start) <= MAX_STEP
-      # can finish with 1 step
-      new_path << [end_idx, (tmax + a[end_idx])]
-    else
-      # need to calculate all the steps recursively
-      done = false
-      (1..MAX_STEP).each do |i|
-        next_i = start + i
-        new_path << [next_i, (tmax + a[next_i])]
-      end
-    end
+# NOTE: this is not tail recursive
+def max_sub(a, start_idx, end_idx, tmax)
+  if (end_idx - start_idx) <= MAX_STEP
+    tmax + a[end_idx]
+  else
+    (1..MAX_STEP).map do |i|
+      max_sub(a, start_idx + i, end_idx, tmax + a[start_idx + i])
+    end.max
   end
-
-  done ? new_path : steps(a, new_path, end_idx)
 end
 
 arr = [1,-2, 0, 9, -1, -2]
