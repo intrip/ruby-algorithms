@@ -44,67 +44,60 @@
 # N is an integer within the range [2..100,000];
 # each element of array A is an integer within the range [−10,000..10,000].
 
+require 'byebug'
+
+MAX_DICE = 6
+MIN_VAL = -10_000
+
 def solution(a)
-  res = 0
-  i = 0
-
-  first_neg_idx = nil
-  neg_count = 0
-
-  while i < a.length
-    if a[i] >= 0
-      if first_neg_idx
-        # we encountered neg numbers, need to update res calculaing max_neg_steps
-        first_neg_idx, neg_count, end_idx, i, res = max_neg_steps(a, first_neg_idx, neg_count, res)
-      else
-        res += a[i]
-      end
-    else
-      first_neg_idx ||= i
-
-      if i == a.length - 1
-        # reached the end of the array: calculate the ending result
-        first_neg_idx, neg_count, end_idx, i, res = max_neg_steps(a, first_neg_idx, neg_count, res)
-      end
-
-      neg_count += 1
-    end
-
-    i += 1
-  end
-
-  res
+  puts "dynamic programming sol:"
+  puts max_sub_dp(a)
+  puts "unoptimized sol:"
+  puts max_sub(a, 0, a.length - 1, a[0])
 end
 
-def max_neg_steps(a, first_neg_idx, neg_count, res)
-  end_idx = first_neg_idx + neg_count
-  i = end_idx
-  res = max_sub(a, first_neg_idx - 1, end_idx, res)
-  # reset
-  first_neg_idx = nil
-  neg_count = 0
-
-  [first_neg_idx, neg_count, end_idx, i, res]
-end
-
-MAX_STEP = 6
-
-# NOTE: this is not tail recursive
+# this takes ~O(2^N-2 - 2^N-8) => O(2^N)
 def max_sub(a, start_idx, end_idx, tmax)
-  if (end_idx - start_idx) <= MAX_STEP
-    tmax + a[end_idx]
-  else
-    (1..MAX_STEP).map do |i|
-      max_sub(a, start_idx + i, end_idx, tmax + a[start_idx + i])
-    end.max
-  end
+  (1..MAX_DICE).map do |dice|
+    next_idx = start_idx + dice
+    # out of bound
+    next MIN_VAL if next_idx > (a.length - 1)
+    # reached end_idx
+    next tmax + a[next_idx] if next_idx == (a.length - 1)
+
+    max_sub(a, start_idx + dice, end_idx, tmax + a[next_idx])
+  end.max
 end
 
-arr = [1,-2, 0, 9, -1, -2]
+# 1, 2 , 4 , -1 -4, -5, -7, -9
+
+# uses dynamic programming (bottom up) to build the solution
+def max_sub_dp(a)
+  dp = Array.new(a.length)
+  dp[0] = a[0]
+
+  (1..(a.length - 1)).each do |i|
+    max = MIN_VAL
+    (1..MAX_DICE).each do |dice|
+     if i - dice >= 0
+       max = [dp[i - dice] + a[i], max].max
+     end
+
+     dp[i] = max
+    end
+  end
+
+  dp.last
+end
+
+# arr = [1,-2, 0, 9, -1, -2]
 # should be 8
-p solution(arr)
+# p solution(arr)
+# p max_sub_dp(arr)
 
-arr = [1,-2, 0, 9, -1, -3, -5, -1, -1, -2, -4, -1, -1 -1, -2]
+# arr = [1,-2, 0, 9, -1, -3, -5, -1, -1, -2, -4, -1, -1 -1, -2]
 # should be 7
-p solution(arr)
+# p solution(arr)
 
+arr = Array.new(22) { rand(2) == 0 ? rand(1000) : (rand(1000) * - 1) }
+solution(arr)
