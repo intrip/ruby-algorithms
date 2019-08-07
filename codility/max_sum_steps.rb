@@ -44,8 +44,6 @@
 # N is an integer within the range [2..100,000];
 # each element of array A is an integer within the range [−10,000..10,000].
 
-require 'byebug'
-
 MAX_DICE = 6
 MIN_VAL = -10_000
 
