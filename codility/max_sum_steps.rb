@@ -67,8 +67,6 @@ def max_sub(a, start_idx, end_idx, tmax)
   end.max
 end
 
-# 1, 2 , 4 , -1 -4, -5, -7, -9
-
 # uses dynamic programming (bottom up) to build the solution
 def max_sub_dp(a)
   dp = Array.new(a.length)
@@ -76,6 +74,8 @@ def max_sub_dp(a)
 
   (1..(a.length - 1)).each do |i|
     max = MIN_VAL
+
+    # compute the best value we can reach up to i from all the previous indexes
     (1..MAX_DICE).each do |dice|
      if i - dice >= 0
        max = [dp[i - dice] + a[i], max].max
