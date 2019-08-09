@@ -14,14 +14,50 @@
 
 # N is an integer within the range [1..2,147,483,647].
 
-def solution(n)
+# less performant: allocates more memory and uses a regex, still O(n)
+def solution_reg(n)
   n.to_s(2)
     .scan(/(?<=1)0+(?=1)/)
     .map(&:length)
     .max.to_i
 end
 
+# more performant, O(n)
+def solution(n)
+  max_gap = 0
+  counting = false
+  count = 0
+
+  loop do
+    # breakpoint: start or finish counting
+    if n & 1 == 1
+      unless counting
+        max_gap = [max_gap, count].max
+        count = 0
+        counting = false
+      else
+        counting = true
+      end
+    else
+      count += 1
+    end
+
+    break if (n >>= 1) <= 0
+  end
+
+  max_gap
+end
+
+p solution_reg(1041)
 p solution(1041)
 # should be 5
+p solution_reg(15)
 p solution(15)
 # should be 0
+
+require 'benchmark'
+
+Benchmark.bmbm do |bm|
+  bm.report("regex solution:") { 100_000.times { solution_reg(1_000_000_123_456) } }
+  bm.report("& solution:") { 100_000.times { solution(1_000_000_123_456) } }
+end
