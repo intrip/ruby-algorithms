@@ -18,7 +18,7 @@ def solution(n)
   n.to_s(2)
     .scan(/(?<=1)0+(?=1)/)
     .map(&:length)
-    .max || 0
+    .max.to_i
 end
 
 p solution(1041)
