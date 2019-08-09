@@ -28,9 +28,9 @@ def solution(n)
   counting = false
   count = 0
 
-  loop do
+  each_bit(n) do |bit|
     # breakpoint: start or finish counting
-    if n & 1 == 1
+    if bit == 1
       unless counting
         max_gap = [max_gap, count].max
         count = 0
@@ -41,11 +41,16 @@ def solution(n)
     else
       count += 1
     end
-
-    break if (n >>= 1) <= 0
   end
 
   max_gap
+end
+
+def each_bit(n)
+  loop do
+    yield n & 1
+    break if (n >>= 1) <= 0
+  end
 end
 
 p solution_reg(1041)
