@@ -50,11 +50,14 @@ MIN_VAL = -10_000
 def solution(a)
   puts "dynamic programming sol:"
   puts max_sub_dp(a)
+  puts "greedy programming sol:"
+  puts max_sub_dp_o1(a)
   puts "unoptimized sol:"
   puts max_sub(a, 0, a.length - 1, a[0])
 end
 
-# this takes ~O(2^N-2 - 2^N-8) => O(2^N)
+# this takes ~O(2^N-2 - 2^N-8) => O(2^N) time
+# and uses O(1) space (excluding call stack space).
 def max_sub(a, start_idx, end_idx, tmax)
   (1..MAX_DICE).map do |dice|
     next_idx = start_idx + dice
@@ -67,7 +70,8 @@ def max_sub(a, start_idx, end_idx, tmax)
   end.max
 end
 
-# uses dynamic programming (bottom up) to build the solution
+# Uses dynamic programming (bottom up) to build the solution.
+# We achieve this in O(n) time and O(n) space.
 def max_sub_dp(a)
   dp = Array.new(a.length)
   dp[0] = a[0]
@@ -88,14 +92,29 @@ def max_sub_dp(a)
   dp.last
 end
 
-# arr = [1,-2, 0, 9, -1, -2]
+# Uses a dynamic programming to compute the solution: to achieve the position i,
+# we can only come from the positions i-6, i-5, i-4, i-3, i-2, and i-1.
+# We achieve this in O(n) time and O(1) space.
+def max_sub_dp_o1(a)
+  max_so_far = Array.new(MAX_DICE, a[0])
+  offset = 1
+  n = a.length - offset
+
+  (offset..n).each do |k|
+    max_so_far[k % MAX_DICE] = max_so_far.max + a[k]
+  end
+
+  max_so_far[n % MAX_DICE]
+end
+
+arr = [1, -2, 0, 9, -1, -2]
 # should be 8
-# p solution(arr)
+# solution(arr)
 # p max_sub_dp(arr)
 
-# arr = [1,-2, 0, 9, -1, -3, -5, -1, -1, -2, -4, -1, -1 -1, -2]
+arr = [1,-2, 0, 9, -1, -3, -5, -1, -1, -2, -4, -1, -1 -1, -2]
 # should be 7
-# p solution(arr)
+# solution(arr)
 
 arr = Array.new(22) { rand(2) == 0 ? rand(1000) : (rand(1000) * - 1) }
 solution(arr)
