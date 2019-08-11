@@ -46,8 +46,15 @@ p solution_dp(p, p.length)
 p solution_dp_bu(p, p.length)
 # should be 22
 
-p = Array.new(23) { rand(100) }
+p = Array.new(200) { rand(100) }
 p solution_dp(p, p.length)
 p solution_dp_bu(p, p.length)
 p solution(p, p.length)
 
+require 'benchmark'
+
+Benchmark.bmbm do |x|
+  # the bottom-up solution is more performant because we do less method calls
+  x.report("optimized memoized:") { 1_000.times { solution_dp(p, p.length) }  }
+  x.report("optimized bottom up:") { 1_000.times { solution_dp_bu(p, p.length) }  }
+end
