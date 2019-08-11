@@ -18,25 +18,25 @@ arr[] = 64 25 12 22 11
 =end
 
 def selection_sort(arr)
-	len = arr.length() -1
-	for i in 0..(len-1)
-		for j in (i+1)..len
-			min = i
-			# if the j item is smaller then current min
-			if arr[j] < arr[min]
-				min = j
-			end
-			arr[i],arr[min]=arr[min],arr[i]
-		end
-	end
-	arr
+  len = arr.length() -1
+  for i in 0..(len-1)
+    for j in (i+1)..len
+      min = i
+      # if the j item is smaller then current min
+      if arr[j] < arr[min]
+        min = j
+      end
+      arr[i],arr[min]=arr[min],arr[i]
+    end
+  end
+  arr
 end
 
 arr = [3, 4, 5, 1, 2]
 times = 10 ** 6
 require 'benchmark'
 Benchmark.bm do |x|
-	x.report("selection_sort: ") { for i in 1..times; selection_sort(arr.clone) end;}
+  x.report("selection_sort: ") { for i in 1..times; selection_sort(arr.clone) end;}
 end
 puts "arr #{arr}"
 puts "Selection sort: #{selection_sort(arr)}"

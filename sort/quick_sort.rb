@@ -12,20 +12,20 @@ array as pivot, put x at its correct position in sorted array and put all smalle
 =end
 
 def partition(arr,start,to)
-	pivot = arr[to]
-	# lower part
-	li = start
+  pivot = arr[to]
+  # lower part
+  li = start
 
-	for ui in li..(to-1)
-		if arr[ui] <= pivot
-			arr[li],arr[ui]=arr[ui],arr[li]
-			li+=1
-		end
-	end
+  for ui in li..(to-1)
+    if arr[ui] <= pivot
+      arr[li],arr[ui]=arr[ui],arr[li]
+      li+=1
+    end
+  end
 
-	# move the pivot in middle
-	arr[li],arr[to]=arr[to],arr[li]
-	li
+  # move the pivot in middle
+  arr[li],arr[to]=arr[to],arr[li]
+  li
 end
 
 def quick_sort(arr,start=0, to=nil)
@@ -45,7 +45,7 @@ arr = [3, 4, 5, 1, 2]
 times = 10 ** 6
 require 'benchmark'
 Benchmark.bm do |x|
-	x.report("quick_sort: ") { for i in 1..times; quick_sort(arr.clone) end;}
+  x.report("quick_sort: ") { for i in 1..times; quick_sort(arr.clone) end;}
 end
 
 puts "arr #{arr}"

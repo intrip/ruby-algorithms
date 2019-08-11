@@ -18,68 +18,68 @@ i = 4. 6 will move to position after 5, and elements from 11 to 13 will move one
 =end
 
 def insertion_sort(arr)
-	n = arr.length() -1
-	for i in 1..n
-		pivot = arr[i]
-		j = i - 1
+  n = arr.length() -1
+  for i in 1..n
+    pivot = arr[i]
+    j = i - 1
 
-		# move every item ahead if is bigger then the pivot
-		# we go backward because the biggest is on the right
-		while(j>=0 && arr[j] > pivot)
-			arr[j+1]=arr[j]
-			j-=1
-		end
-		# then valorize the pivot
-		arr[j+1] = pivot
-	end
+    # move every item ahead if is bigger then the pivot
+    # we go backward because the biggest is on the right
+    while(j>=0 && arr[j] > pivot)
+      arr[j+1]=arr[j]
+      j-=1
+    end
+    # then valorize the pivot
+    arr[j+1] = pivot
+  end
 
-	arr
+  arr
 end
 
 # returns where the new pivot should be insert
 def bsearch_ins_pivot(arr,pivot,from=0,to=nil)
-	to = arr.length() -1 if to.nil?
-	
-	if to <= from
-		# if the from is bigger than the pivot need to be insert in his position, otherwise the position after
-		return (arr[from] > pivot) ? from : from+1
-	end
+  to = arr.length() -1 if to.nil?
 
-	mid = (to+from) / 2
+  if to <= from
+    # if the from is bigger than the pivot need to be insert in his position, otherwise the position after
+    return (arr[from] > pivot) ? from : from+1
+  end
 
-	if(arr[mid] == pivot)
-		return mid+1;
-	end
+  mid = (to+from) / 2
 
-	if(pivot < arr[mid])
-		return bsearch_ins_pivot(arr,pivot,from,mid-1)
-	end
-	bsearch_ins_pivot(arr,pivot,mid+1,to)
+  if(arr[mid] == pivot)
+    return mid+1;
+  end
+
+  if(pivot < arr[mid])
+    return bsearch_ins_pivot(arr,pivot,from,mid-1)
+  end
+  bsearch_ins_pivot(arr,pivot,mid+1,to)
 end
 
 def insertion_sort_pivot(arr)
-	n = arr.length() -1
-	for i in 1..n
-		pivot = arr[i]
-		j = i-1
+  n = arr.length() -1
+  for i in 1..n
+    pivot = arr[i]
+    j = i-1
 
-		pos = bsearch_ins_pivot(arr,pivot,0,j)
-		while(j>=pos)
-			arr[j+1]=arr[j]
-			j-=1
-		end
-		arr[j+1]= pivot
-	end
-	arr
+    pos = bsearch_ins_pivot(arr,pivot,0,j)
+    while(j>=pos)
+      arr[j+1]=arr[j]
+      j-=1
+    end
+    arr[j+1]= pivot
+  end
+  arr
 end
 
 arr = [3, 4, 5, 1, 2]
 
 times = 10 ** 6
 require 'benchmark'
- Benchmark.bm do |x|
-	 x.report("insertion_sort: ") { for i in 1..times; insertion_sort(arr.clone) end;}
- end
+Benchmark.bm do |x|
+  x.report("insertion_sort: ") { for i in 1..times; insertion_sort(arr.clone) end;}
+end
 puts "arr #{arr}"
 puts "Insertion sort: #{insertion_sort(arr.clone)}"
 puts "Insertion sort: #{insertion_sort_pivot(arr.clone)}"
