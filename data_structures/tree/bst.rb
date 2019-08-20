@@ -154,18 +154,34 @@ class BST
 
   # replace the subtree rooted at node u with
   # the subtree rooted ad the node v
+  #
+  #     b
+  #    / \
+  #   r   u
+  #      / \
+  #     x   v
+  #        / \
+  #       y   z
+  #
+  #      =>
+  #
+  #      b
+  #     / \
+  #    r   v
+  #       / \
+  #      y   z
   def transplant(u, v = nil)
-    @root = v if u.p == nil
-
-    update_depth(v, u.depth)
-
-    if u.p&.l == u
+    if u.p == nil
+      @root = v
+    elsif u.p&.l == u
       u.p.l = v
     else
       u.p.r = v if u.p&.r
     end
 
     v.p = u.p if v
+
+    update_depth(v, u.depth)
   end
 
   def search(key)

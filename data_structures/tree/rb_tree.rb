@@ -1,4 +1,5 @@
 require 'readline'
+require 'byebug'
 
 # Red back tree
 # Is an extended BST. A RB tree node in fact has the property color (c)
@@ -162,7 +163,7 @@ class RBTree
       end
     end
 
-    rb_insert_fixup(z)
+    insert_fixup(z)
     @nodes_count += 1
     if z.height == tree_height
       @highest_leafs << z
@@ -170,54 +171,6 @@ class RBTree
     update_tree_height(z)
 
     z
-  end
-
-  # fix the red black violations: either rule 4 or 2
-  def rb_insert_fixup(z)
-    while z.p&.c == 'r'
-      if z.p == z.p.p.l
-        y = z.p.p.r
-        # case 1: uncle red
-        if y.c == 'r'
-          z.p.c = 'b'
-          y.c = 'b'
-          z.p.p.c = 'r'
-          z = z.p.p
-        else
-          # case2: uncle black and right child
-          if z == z.p.r
-            z = z.p
-            rotate_l(z)
-          end
-
-          # case3: uncle black and left child
-          z.p.c = 'b'
-          z.p.p.c = 'r'
-          rotate_r(z.p.p)
-        end
-      # same as the if with l and r swapped
-      else
-        y = z.p.p.l
-        if y.c == 'r'
-          z.p.c = 'b'
-          y.c = 'b'
-          z.p.p.c = 'r'
-          z = z.p.p
-        else
-          if z == z.p.l
-            z = z.p
-            rotate_r(z)
-          end
-
-          z.p.c = 'b'
-          z.p.p.c = 'r'
-          rotate_l(z.p.p)
-        end
-      end
-    end
-
-    # root is always black to fix rule 2
-    root.c = 'b'
   end
 
   # rotates a node left
@@ -248,7 +201,7 @@ class RBTree
     y_new_height = z.height
     # reduce tree_height to force recaulculation if rotation could reduce the tree_height
     if z.height == (tree_height - 2)
-      puts "Reduce height to #{z.height}"
+      puts_debug "Reduce height to #{z.height}"
       @tree_height = z.height
     end
 
@@ -330,8 +283,69 @@ class RBTree
     z
   end
 
+  # Removes a node from the tree
   def delete(z)
-    # TODO
+    y = z
+    y_original_c = z.c
+
+    if z.l.nil_node?
+      x = z.r
+      transplant(z, z.r)
+    elsif z.r.nil_node?
+      x = z.l
+      transplant(z, z.l)
+    else
+      y = min(z.r)
+      y_original_c = y.c
+      x = y.r
+      if y.p == z
+        x.p = y
+      else
+        transplant(y, y.r)
+        y.r = z.r
+        y.r.p = y
+      end
+      transplant(z, y)
+      y.l = z.l
+      y.l.p = y
+      y.c = z.c
+    end
+
+    if y_original_c == 'b'
+      delete_fixup(x)
+    end
+  end
+
+  # replace the subtree rooted at node u with
+  # the subtree rooted ad the node v
+  #
+  #     b
+  #    / \
+  #   r   u
+  #      / \
+  #     x   v
+  #        / \
+  #       y   z
+  #
+  #      =>
+  #
+  #      b
+  #     / \
+  #    r   v
+  #       / \
+  #      y   z
+  def transplant(u,v)
+    if @root == u
+      @root = v
+    elsif u == u.p.l
+      u.p.l = v
+    elsif u == u.p.r
+      u.p.r = v
+    end
+
+    v.p = u.p
+
+    update_height(v, u.height)
   end
 
   def search(key)
@@ -349,12 +363,12 @@ class RBTree
   end
 
   def min(current)
-    current = current.l while current.l
+    current = current.l while !current.l.nil_node?
     current
   end
 
   def max(current)
-    current = current.r while current.r
+    current = current.r while !current.r.nil_node?
     current
   end
 
@@ -451,6 +465,111 @@ class RBTree
 
   private
 
+  # fix the red black violations: either rule 4 or 2
+  def insert_fixup(z)
+    while z.p&.c == 'r'
+      if z.p == z.p.p.l
+        y = z.p.p.r
+        # case 1: uncle red
+        if y.c == 'r'
+          z.p.c = 'b'
+          y.c = 'b'
+          z.p.p.c = 'r'
+          z = z.p.p
+        else
+          # case2: uncle black and right child
+          if z == z.p.r
+            z = z.p
+            rotate_l(z)
+          end
+
+          # case3: uncle black and left child
+          z.p.c = 'b'
+          z.p.p.c = 'r'
+          rotate_r(z.p.p)
+        end
+      # same as the if with l and r swapped
+      else
+        y = z.p.p.l
+        if y.c == 'r'
+          z.p.c = 'b'
+          y.c = 'b'
+          z.p.p.c = 'r'
+          z = z.p.p
+        else
+          if z == z.p.l
+            z = z.p
+            rotate_r(z)
+          end
+
+          z.p.c = 'b'
+          z.p.p.c = 'r'
+          rotate_l(z.p.p)
+        end
+      end
+    end
+
+    # root is always black to fix rule 2
+    root.c = 'b'
+  end
+
+  # fix the red balack violations (rules 1, 2, 4) after node deletion by moving the double black up to the
+  # tree until we reach the root
+  def delete_fixup(x)
+    byebug
+    while x != @root && x.c == 'b'
+      if x == x.p.l
+        w = x.p.r
+        if w.c == 'r'
+          w.c = 'b'
+          w.p.c = 'r'
+          rotate_l(x.p)
+          w = x.p.r
+        end
+        # @dup
+        if w.l.c == 'b' && w.r.c == 'b'
+          w.c = 'r'
+          x = x.p
+        elsif w.r.c = 'b'
+          w.l.c = 'b'
+          w.c = 'r'
+          rotate_r(w)
+          w = x.p.r
+        end
+        w.c = x.p.c
+        x.p.c = 'b'
+        w.r.c = 'b'
+        rotate_l(x.p)
+        x = @root # to stop the loop
+      else
+        w = x.p.l
+        if w.c = 'r'
+          w.c = 'b'
+          w.p.c = 'r'
+          rotate_r(x.p)
+          x = x.p.l
+        end
+        # @dup
+        if w.l.c == 'b' && w.r.c == 'b'
+          w.c = 'r'
+          x = x.p
+        elsif w.l.c == 'b'
+          w.r.c = 'b'
+          w.c = 'r'
+          rotate_l(w)
+          w = x.p.l
+        end
+        w.c = x.p.c
+        w.p.c = 'b'
+        w.l.c = 'b'
+        rotate_r(x.p)
+        x = @root # to stop the loop
+      end
+
+    end
+    x.c = 'b'
+  end
+
   def print_node(node)
     puts "#{node.as_str} #{ '(root)' if node.key == root.key }"
   end
@@ -467,10 +586,10 @@ class RBTree
 
     update_tree_height(node)
 
-    if !node.l.nil_node?
+    if node.l && !node.l.nil_node?
       update_height(node.l, height + 1)
     end
-    if !node.r.nil_node?
+    if node.r && !node.r.nil_node?
       update_height(node.r, height + 1)
     end
   end
@@ -527,25 +646,30 @@ class RBTree
 end
 
 rbt = RBTree.new
+# keys = []
 # [3,2,1,4,7,8,9,13,22].each do |i|
-keys = []
-5.times do |i|
-  k = rand(100)
-  if keys.include?(k)
-    next
-  end
-  keys << k
+[41, 38, 31, 12, 19, 8].each do |i|
+# 5.times do |i|
+  # k = rand(100)
+  # if keys.include?(k)
+  #   next
+  # end
+  # keys << k
   # rbt.insert(k)
   rbt.insert(i)
-  puts rbt.balance_info
-  rbt.horizontal_tree_walk
-  # readline
+  # puts rbt.balance_info
+  # rbt.horizontal_tree_walk
 end
 
+# TODO fix delete_fixup when deleting the root, this happens because x is a nil node...
 
-# TODO go from here
-# do the delete
-
+# Manual tests:
+rbt.horizontal_tree_walk
+rbt.delete(rbt.search(38))
+rbt.horizontal_tree_walk
+puts rbt.balance_info
+# puts "transplant 19 => 31"
+# rbt.transplant(rbt.search(19), rbt.search(31))
 # rbt.horizontal_tree_walk
 # puts rbt.balance_info
 # puts "\n"
@@ -562,5 +686,5 @@ end
 # rbt.inorder_tree_walk(rbt.root)
 # puts "Preorder tree walk:"
 # rbt.preorder_tree_walk(rbt.root)
-puts "Postorder tree walk:"
-rbt.postorder_tree_walk(rbt.root)
+# puts "Postorder tree walk:"
+# rbt.postorder_tree_walk(rbt.root)
