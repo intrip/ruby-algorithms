@@ -26,9 +26,20 @@ def solution(a)
   # in the ordered list or use the Gauss theorem: https://study.com/academy/lesson/finding-the-sum-of-consecutive-numbers.html
   #
   # if we use the Gauss theorem we can do:
-  # sum = (1 + N+1) * / ( (1 + N+1) / 2 )
+  # sum = (1 + N+1) * ( N / 2 )
   #
   # if (1 + N+1) % 2 == 1 we need to sum also (n+1+1)/2 + 1
   #
   # then remove every item from the sum: the remainder is the missing number
+  len = a.length
+  sum = (1 + len + 1) * ((len + 1) / 2)
+  sum += ((len + 1) / 2.0).ceil unless (len + 1) % 2 == 0
+
+  a.reduce(sum) do |sum, i|
+    sum - i
+  end
 end
+
+a = [2, 3, 1, 5]
+p solution(a)
+# should be 4
