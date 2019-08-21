@@ -2,7 +2,6 @@
 # the pair (i,j) is called an inversion of A.
 #
 # The method below finds all the inversion of arr in nlog(n) time.
-# NOTE: this is not tail recursive, we could make it tail recursive by passing an extra param that handles the count
 def count_inversions(arr, l, r)
   inversions = 0
 

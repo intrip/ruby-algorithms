@@ -1,4 +1,9 @@
-KEY_SPAN = 3
+# BST is a Binary search tree
+#
+# The tree has the following property: for every node his left node are <= then the parent and
+# the parent is <= than his right node.
+# This property allows to do all the important operation in O(h) == log(n) (if the tree is balanced)
+#
 class Node
   attr_reader :key
   attr_accessor :p, :l, :r, :depth
@@ -346,6 +351,33 @@ class BST
   end
 end
 
+
+def driver
+  rbt = BST.new
+
+  puts "Here we create a random tree:"
+  keys = []
+  10.times do |i|
+    k = rand(100)
+    next if keys.include?(k)
+
+    keys << k
+    rbt.insert(k)
+    rbt.horizontal_tree_walk
+    readline
+  end
+
+  puts "Here we create an unbalanced tree:"
+  rbt = BST.new
+  (1..6).each do |i|
+    rbt.insert(i)
+    rbt.horizontal_tree_walk
+    readline
+  end
+end
+
+driver
+
 bst = BST.new(RootNode.new(25))
 bst.insert(5)
 bst.insert(2)
@@ -355,26 +387,30 @@ bst.insert(35)
 bst.insert(15)
 bst.insert(11)
 
+
 puts "Horizontal tree walk:"
 bst.horizontal_tree_walk
-# puts "Inorder tree walk:"
-# bst.inorder_tree_walk(bst.root)
-# puts "Preorder tree walk:"
-# bst.preorder_tree_walk(bst.root)
-# puts "Postorder tree walk:"
-# bst.postorder_tree_walk(bst.root)
 
-# puts "\n" * 2
-# puts "Search 35:"
-# bst.print_node(bst.search(35))
-# puts "Min 25:"
-# bst.print_node(bst.min(bst.search(25)))
-# puts "Max 25:"
-# bst.print_node(bst.max(bst.search(25)))
-# puts "Successor 6:"
-# bst.print_node(bst.successor(bst.search(6)))
-# puts "Predecessor 25:"
-# bst.print_node(bst.predecessor(bst.search(25)))
-# puts "Delete node: 25"
-# bst.delete(bst.search(25))
-# bst.horizontal_tree_walk
+puts "Inorder tree walk:"
+bst.inorder_tree_walk(bst.root)
+puts "Preorder tree walk:"
+bst.preorder_tree_walk(bst.root)
+puts "Postorder tree walk:"
+bst.postorder_tree_walk(bst.root)
+
+puts "Search 35:"
+bst.print_node(bst.search(35))
+puts "Min 25:"
+bst.print_node(bst.min(bst.search(25)))
+puts "Max 25:"
+bst.print_node(bst.max(bst.search(25)))
+puts "Successor 6:"
+bst.print_node(bst.successor(bst.search(6)))
+puts "Predecessor 25:"
+bst.print_node(bst.predecessor(bst.search(25)))
+
+bst.horizontal_tree_walk
+puts "Delete node: 25"
+bst.delete(bst.search(25))
+bst.horizontal_tree_walk
+

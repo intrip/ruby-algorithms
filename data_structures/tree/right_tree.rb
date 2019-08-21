@@ -1,3 +1,5 @@
+# This tree can have n childrens
+
 Node = Struct.new(:left_c, :right_s, :key)
 
 class Tree
@@ -53,7 +55,7 @@ root = Node.new(nil, nil, 'root')
 tree = Tree.new(root)
 b = tree.add_child(root, 'b')
 c = tree.add_sibling(b, 'c')
-d = tree.add_sibling(c, 'd')
-e = tree.add_child(c, 'e')
+tree.add_sibling(c, 'd')
+tree.add_child(c, 'e')
 
 puts tree

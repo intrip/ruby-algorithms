@@ -1,3 +1,6 @@
+# Given a Linked List and a number n, write a function that returns the value at the n’th node from the end of the Linked List.
+# 1,2,3,4,5 k = 2
+
 class LinkedListNode
   attr_accessor :value, :next
 
@@ -41,7 +44,9 @@ def kth_to_last_node_2(i, root)
 
   loop do
     new_current, steps = k_steps(i, current)
-    # we reached the end
+    # we reached the end so now we only move by the steps needed in order to
+    # reach the end from current but we do it on previous thus the result is
+    # the kth last node
     if !new_current
       res = k_steps(steps, previous)
       return res.first

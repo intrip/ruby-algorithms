@@ -69,23 +69,6 @@ class BasicQueue
   end
 end
 
-=begin
-# q = Queue.new
-q = BasicQueue.new
-
-q.enqueue(1)
-q.enqueue(2)
-q.enqueue(3)
-# overflow
-# q.enqueue(4)
-
-p q.dequeue
-p q.dequeue
-p q.dequeue
-# underflow
-# p q.dequeue
-=end
-
 require 'benchmark'
 
 GC.disable

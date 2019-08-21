@@ -659,9 +659,9 @@ end
 
 def driver
   rbt = RBTree.new
-  keys = []
 
   puts "Here we create a random tree:"
+  keys = []
   15.times do |i|
     k = rand(100)
     next if keys.include?(k)

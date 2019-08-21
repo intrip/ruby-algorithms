@@ -42,19 +42,20 @@ def min_depth(node)
 
   # if right subtree nil go to the left
   if node.right == nil
-    min_depth(node.left)+1
+    min_depth(node.left) + 1
   end
 
   # if left subtree nil go to the right
   if node.left == nil
-    min_depth(node.right)+1
+    min_depth(node.right) + 1
   end
 
   # i have both left and right child then navigate in both sides
-  [min_depth(node.right),min_depth(node.left)].min + 1
+  [min_depth(node.right), min_depth(node.left)].min + 1
 end
 
 # In this case we compare the tree in a traversal order using a queue structure
+# this solution is more performant if the min_depth < max_depth
 def min_depth_opt(node)
   # edge case: when called with nil
   if node == nil
@@ -103,5 +104,3 @@ end
 puts "\n"
 puts "min_depth res: #{min_depth(root)}"
 puts "min_depth_opt res: #{min_depth_opt(root)}"
-
-

@@ -44,8 +44,8 @@ def find_pivot(arr, start=0, to=nil)
     to = arr.size() -1
   end
 
-  if start >= to 
-    return -1	
+  if start >= to
+    return -1
   end
 
   mid = (start+to) / 2
@@ -95,7 +95,7 @@ def bsearch_pivot_opt(arr, val, start=0, to=nil)
 
   mid = (start+to) / 2
 
-  if val==arr[mid]
+  if val == arr[mid]
     return mid
   end
 
@@ -118,8 +118,8 @@ end
 
 require 'benchmark'
 # Benchmark.bm do |x|
-# 	x.report("bsearch_pivot: ") { for i in 1..1000000; bsearch_pivot(arr,2) end;}
-# 	x.report("bsearch_pivot_opt: ") { for i in 1..1000000; bsearch_pivot_opt(arr,2) end;}
+# x.report("bsearch_pivot: ") { for i in 1..1000000; bsearch_pivot(arr,2) end;}
+# x.report("bsearch_pivot_opt: ") { for i in 1..1000000; bsearch_pivot_opt(arr,2) end;}
 # end
 puts "Bsearch pivot: #{bsearch_pivot(arr,2)}"
 #@TODO fix this!!!
