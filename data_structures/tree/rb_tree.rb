@@ -1,5 +1,4 @@
 require 'readline'
-require 'byebug'
 
 # Red back tree
 # Is an extended BST. A RB tree node in fact has the property color (c)
@@ -16,8 +15,11 @@ require 'byebug'
 #
 # RB tree has the important property that guarantees that their height is <= 2log(n+1)
 # thus all the tree operatins can run in O(lgn).
+#
+# To simplify boundary conditions in this implementation we use a sentinel NilNode.
+# All the leaf l and r points to the sentinel and also the root.p points to the sentinel.
 
-# Adds color to Str class: not optimal to monkey patch ruby core classes but for this purpose it's allright :-)
+# Adds color to Str class: not optimal to monkey patch ruby core classes but here it's allright :-)
 class String
   def colorize(color_code)
     "\e[#{color_code}m#{self}\e[0m"
@@ -62,7 +64,7 @@ class Node
   end
 
   def inspect
-    "#{key}@#{c}:#{p&.key},#{l&.key},#{r&.key};#{height}."
+    "#{key || 'Nil' }@#{c}:#{p&.key},#{l&.key},#{r&.key};#{height}."
   end
 
   private
@@ -81,7 +83,7 @@ class Node
   end
 end
 
-# Every leaf node is a nil node in a RBTree, also the root.p
+# Every leaf node is a nil node and also the root.p
 class NilNode < Node
   def initialize(*args)
     super(nil, nil, nil, nil, nil, nil)
@@ -101,6 +103,7 @@ class NilNode < Node
   end
 end
 
+# Used to correctly pad the nodes
 class EmptyNode < Node
   LIGHT_GRAY = 2
 
@@ -133,7 +136,7 @@ class RBTree
     @debug = debug
   end
 
-  # insert a node with key in the tree
+  # insert a node key in the tree
   def insert(key)
     y = nil_node
     x = root
@@ -194,7 +197,7 @@ class RBTree
   #
   def rotate_l(z)
     y = z.r
-    return false unless y
+    return false if y.nil_node?
 
     puts_debug "Rotate L: #{z.as_str}"
 
@@ -249,7 +252,7 @@ class RBTree
   #
   def rotate_r(z)
     y = z.l
-    return false unless y
+    return false if y.nil_node?
 
     puts_debug "Rotate R: #{z.as_str}"
 
@@ -353,10 +356,10 @@ class RBTree
 
     while current && current.key != key
       current = if key < current.key
-        current.l
-      else
-        current.r
-      end
+                  current.l
+                else
+                  current.r
+                end
     end
 
     current
@@ -373,7 +376,7 @@ class RBTree
   end
 
   def successor(z)
-    if z.r
+    if !z.r.nil_node?
       return min(z.r)
     end
 
@@ -388,7 +391,7 @@ class RBTree
   end
 
   def predecessor(z)
-    if z.l
+    if !z.l.nil_node?
       return max(z.l)
     end
 
@@ -402,7 +405,16 @@ class RBTree
     y
   end
 
-  # pretty prints the tree
+  # pretty prints the tree:
+  #
+  #           41
+  #     /           \
+  #     19          *
+  #  /     \     /     \
+  #  12    31    *     *
+  # /  \  /  \  /  \  /  \
+  #  8 *  *  *  *  *  *  *
+  #
   def horizontal_tree_walk
     path = [root]
     current_height = 0
@@ -435,7 +447,7 @@ class RBTree
   end
 
   def inorder_tree_walk(current)
-    return unless current
+    return if current.nil_node?
 
     inorder_tree_walk(current.l)
     print_node(current)
@@ -443,7 +455,7 @@ class RBTree
   end
 
   def preorder_tree_walk(current)
-    return unless current
+    return if current.nil_node?
 
     print_node(current)
     preorder_tree_walk(current.l)
@@ -451,7 +463,7 @@ class RBTree
   end
 
   def postorder_tree_walk(current)
-    return unless current
+    return if current.nil_node?
 
     postorder_tree_walk(current.l)
     postorder_tree_walk(current.r)
@@ -488,7 +500,7 @@ class RBTree
           z.p.p.c = 'r'
           rotate_r(z.p.p)
         end
-      # same as the if with l and r swapped
+        # same as the if with l and r swapped
       else
         y = z.p.p.l
         if y.c == 'r'
@@ -516,7 +528,6 @@ class RBTree
   # fix the red balack violations (rules 1, 2, 4) after node deletion by moving the double black up to the
   # tree until we reach the root
   def delete_fixup(x)
-    byebug
     while x != @root && x.c == 'b'
       if x == x.p.l
         w = x.p.r
@@ -526,46 +537,47 @@ class RBTree
           rotate_l(x.p)
           w = x.p.r
         end
-        # @dup
         if w.l.c == 'b' && w.r.c == 'b'
           w.c = 'r'
           x = x.p
-        elsif w.r.c = 'b'
-          w.l.c = 'b'
-          w.c = 'r'
-          rotate_r(w)
-          w = x.p.r
+        else
+          if w.r.c = 'b'
+            w.l.c = 'b'
+            w.c = 'r'
+            rotate_r(w)
+            w = x.p.r
+          end
+          w.c = x.p.c
+          x.p.c = 'b'
+          w.r.c = 'b'
+          rotate_l(x.p)
+          x = @root # to stop the loop
         end
-        w.c = x.p.c
-        x.p.c = 'b'
-        w.r.c = 'b'
-        rotate_l(x.p)
-        x = @root # to stop the loop
       else
         w = x.p.l
         if w.c = 'r'
           w.c = 'b'
           w.p.c = 'r'
           rotate_r(x.p)
-          x = x.p.l
+          w = x.p.l
         end
-        # @dup
         if w.l.c == 'b' && w.r.c == 'b'
           w.c = 'r'
           x = x.p
-        elsif w.l.c == 'b'
-          w.r.c = 'b'
-          w.c = 'r'
-          rotate_l(w)
-          w = x.p.l
+        else
+          if w.l.c == 'b'
+            w.r.c = 'b'
+            w.c = 'r'
+            rotate_l(w)
+            w = x.p.l
+          end
+          w.c = x.p.c
+          w.p.c = 'b'
+          w.l.c = 'b'
+          rotate_r(x.p)
+          x = @root # to stop the loop
         end
-        w.c = x.p.c
-        w.p.c = 'b'
-        w.l.c = 'b'
-        rotate_r(x.p)
-        x = @root # to stop the loop
       end
-
     end
     x.c = 'b'
   end
@@ -645,46 +657,64 @@ class RBTree
   end
 end
 
-rbt = RBTree.new
-# keys = []
-# [3,2,1,4,7,8,9,13,22].each do |i|
-[41, 38, 31, 12, 19, 8].each do |i|
-# 5.times do |i|
-  # k = rand(100)
-  # if keys.include?(k)
-  #   next
-  # end
-  # keys << k
-  # rbt.insert(k)
-  rbt.insert(i)
-  # puts rbt.balance_info
-  # rbt.horizontal_tree_walk
+def driver
+  rbt = RBTree.new
+  keys = []
+
+  puts "Here we create a random tree:"
+  15.times do |i|
+    k = rand(100)
+    next if keys.include?(k)
+
+    keys << k
+    rbt.insert(k)
+    rbt.horizontal_tree_walk
+    puts rbt.balance_info
+    readline
+  end
+
+  puts "Here we create an unbalanced tree and let RBTree fix that:"
+  rbt = RBTree.new
+  (1..15).each do |i|
+    rbt.insert(i)
+    rbt.horizontal_tree_walk
+    puts rbt.balance_info
+    readline
+  end
 end
 
-# TODO fix delete_fixup when deleting the root, this happens because x is a nil node...
+driver
+
+rbt = RBTree.new
+[41, 38, 31, 12, 19, 8].each do |i|
+  rbt.insert(i)
+end
+# uncomment to enable debug
+# rbt.debug = true
 
 # Manual tests:
 rbt.horizontal_tree_walk
+
+puts "Deleting node 38"
 rbt.delete(rbt.search(38))
 rbt.horizontal_tree_walk
 puts rbt.balance_info
+
 # puts "transplant 19 => 31"
 # rbt.transplant(rbt.search(19), rbt.search(31))
 # rbt.horizontal_tree_walk
 # puts rbt.balance_info
-# puts "\n"
-# puts "left rotate root (25)"
-# rbt.rotate_l(rbt.root)
-# rbt.horizontal_tree_walk
-# puts "right rotate (30)"
-# rbt.rotate_r(rbt.search(30))
-# rbt.horizontal_tree_walk
-# puts "right rotate (25)"
-# rbt.rotate_r(rbt.search(25))
-# rbt.horizontal_tree_walk
-# puts "\nInorder tree walk:"
-# rbt.inorder_tree_walk(rbt.root)
-# puts "Preorder tree walk:"
-# rbt.preorder_tree_walk(rbt.root)
-# puts "Postorder tree walk:"
-# rbt.postorder_tree_walk(rbt.root)
+
+puts "left rotate root"
+rbt.rotate_l(rbt.root)
+rbt.horizontal_tree_walk
+puts "right rotate (41)"
+rbt.rotate_r(rbt.search(41))
+rbt.horizontal_tree_walk
+
+puts "\nInorder tree walk:"
+rbt.inorder_tree_walk(rbt.root)
+puts "Preorder tree walk:"
+rbt.preorder_tree_walk(rbt.root)
+puts "Postorder tree walk:"
+rbt.postorder_tree_walk(rbt.root)
