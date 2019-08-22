@@ -695,11 +695,6 @@ end
 # Manual tests:
 rbt.horizontal_tree_walk
 
-puts "Deleting node 38"
-rbt.delete(rbt.search(38))
-rbt.horizontal_tree_walk
-puts rbt.balance_info
-
 # puts "transplant 19 => 31"
 # rbt.transplant(rbt.search(19), rbt.search(31))
 # rbt.horizontal_tree_walk
@@ -718,3 +713,24 @@ puts "Preorder tree walk:"
 rbt.preorder_tree_walk(rbt.root)
 puts "Postorder tree walk:"
 rbt.postorder_tree_walk(rbt.root)
+
+puts "Deleting node 8"
+rbt.delete(rbt.search(8))
+rbt.horizontal_tree_walk
+puts "Deleting node 12"
+rbt.delete(rbt.search(12))
+rbt.horizontal_tree_walk
+puts "Deleting node 19"
+rbt.delete(rbt.search(19))
+rbt.horizontal_tree_walk
+puts "Deleting node 31"
+rbt.delete(rbt.search(31))
+rbt.horizontal_tree_walk
+puts "Deleting node 38"
+rbt.delete(rbt.search(38))
+rbt.horizontal_tree_walk
+puts "Deleting node 41"
+rbt.delete(rbt.search(41))
+rbt.horizontal_tree_walk
+
+# TODO: handle when deleting a leaf should reduce the tree.tree_height as well
