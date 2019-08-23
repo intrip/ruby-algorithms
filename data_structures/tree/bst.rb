@@ -5,6 +5,8 @@
 # This property allows to do all the important operation in O(h) == log(n) (if the tree is balanced)
 #
 class Node
+  KEY_SPAN = 3
+
   attr_reader :key
   attr_accessor :p, :l, :r, :depth
 
@@ -17,7 +19,7 @@ class Node
   end
 
   def render(padding)
-    print pad(*padding, key.to_s.rjust(KEY_SPAN))
+    print pad(*padding, key.to_s.rjust(Node::KEY_SPAN))
   end
 
   def null_node?
@@ -343,7 +345,7 @@ class BST
   end
 
   def span_for(depth)
-    KEY_SPAN * nodes_count(depth)
+    Node::KEY_SPAN * nodes_count(depth)
   end
 
   def nodes_count(depth)
@@ -376,41 +378,40 @@ def driver
   end
 end
 
-driver
+# driver
 
-bst = BST.new(RootNode.new(25))
-bst.insert(5)
-bst.insert(2)
-bst.insert(6)
-bst.insert_r(30)
-bst.insert(35)
-bst.insert(15)
-bst.insert(11)
+# bst = BST.new(RootNode.new(25))
+# bst.insert(5)
+# bst.insert(2)
+# bst.insert(6)
+# bst.insert_r(30)
+# bst.insert(35)
+# bst.insert(15)
+# bst.insert(11)
 
 
-puts "Horizontal tree walk:"
-bst.horizontal_tree_walk
+# puts "Horizontal tree walk:"
+# bst.horizontal_tree_walk
 
-puts "Inorder tree walk:"
-bst.inorder_tree_walk(bst.root)
-puts "Preorder tree walk:"
-bst.preorder_tree_walk(bst.root)
-puts "Postorder tree walk:"
-bst.postorder_tree_walk(bst.root)
+# puts "Inorder tree walk:"
+# bst.inorder_tree_walk(bst.root)
+# puts "Preorder tree walk:"
+# bst.preorder_tree_walk(bst.root)
+# puts "Postorder tree walk:"
+# bst.postorder_tree_walk(bst.root)
 
-puts "Search 35:"
-bst.print_node(bst.search(35))
-puts "Min 25:"
-bst.print_node(bst.min(bst.search(25)))
-puts "Max 25:"
-bst.print_node(bst.max(bst.search(25)))
-puts "Successor 6:"
-bst.print_node(bst.successor(bst.search(6)))
-puts "Predecessor 25:"
-bst.print_node(bst.predecessor(bst.search(25)))
+# puts "Search 35:"
+# bst.print_node(bst.search(35))
+# puts "Min 25:"
+# bst.print_node(bst.min(bst.search(25)))
+# puts "Max 25:"
+# bst.print_node(bst.max(bst.search(25)))
+# puts "Successor 6:"
+# bst.print_node(bst.successor(bst.search(6)))
+# puts "Predecessor 25:"
+# bst.print_node(bst.predecessor(bst.search(25)))
 
-bst.horizontal_tree_walk
-puts "Delete node: 25"
-bst.delete(bst.search(25))
-bst.horizontal_tree_walk
-
+# bst.horizontal_tree_walk
+# puts "Delete node: 25"
+# bst.delete(bst.search(25))
+# bst.horizontal_tree_walk

@@ -27,8 +27,9 @@ class String
 end
 
 # the width of each printed node key
-KEY_SPAN = 3
 class Node
+  KEY_SPAN = 3
+
   attr_reader :key
   attr_accessor :p, :l, :r, :c, :height
 
@@ -46,7 +47,7 @@ class Node
   end
 
   def as_str_padded
-    key_s.rjust(KEY_SPAN).colorize(color)
+    key_s.rjust(Node::KEY_SPAN).colorize(color)
   end
 
   def as_str
@@ -639,7 +640,7 @@ class RBTree
   end
 
   def span_for(height)
-    KEY_SPAN * nodes_count(height)
+    Node::KEY_SPAN * nodes_count(height)
   end
 
   def nodes_count(height)
