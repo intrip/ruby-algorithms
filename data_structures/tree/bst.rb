@@ -1,3 +1,5 @@
+require_relative '../utils/print_binary_tree.rb'
+
 # BST is a Binary search tree
 #
 # The tree has the following property: for every node his left node are <= then the parent and
@@ -8,14 +10,14 @@ class Node
   KEY_SPAN = 3
 
   attr_reader :key
-  attr_accessor :p, :l, :r, :depth
+  attr_accessor :p, :l, :r, :height
 
-  def initialize(key, p, l, r, depth)
+  def initialize(key, p, l, r, height)
     @key = key
     @p = p
     @l = l
     @r = r
-    @depth = depth
+    @height = height
   end
 
   def render(padding)
@@ -40,19 +42,19 @@ class Node
 end
 
 class RootNode < Node
-  def initialize(key, p = nil, l = nil, r = nil, depth= nil)
+  def initialize(key, p = nil, l = nil, r = nil, height= nil)
     @key = key
     @p = p
     @l = l
     @r = r
-    @depth = 0
+    @height = 0
   end
 end
 
 class EmptyNode < Node
   class << self
-    def from_node(node)
-      self.new(nil, node, nil, nil, node.depth + 1)
+    def from_node(node, nil_node)
+      self.new(nil_node, node, nil_node, nil_node, node.height + 1)
     end
   end
 
@@ -66,11 +68,11 @@ class EmptyNode < Node
 end
 
 class BST
-  attr_reader :max_depth, :root
+  attr_reader :max_height, :root
 
   def initialize(root = nil)
     @root = root
-    @max_depth = 0
+    @max_height = 0
   end
 
   def insert(key)
@@ -90,7 +92,7 @@ class BST
       z = Node.new(key, nil, nil, nil, 0)
       @root = z
     else
-      z = Node.new(key, y, nil, nil, y.depth + 1)
+      z = Node.new(key, y, nil, nil, y.height + 1)
       if z.key < y.key
         y.l = z
       else
@@ -98,9 +100,9 @@ class BST
       end
     end
 
-    # set tree max depth
-    if z.depth > max_depth
-      @max_depth = z.depth
+    # set tree max height
+    if z.height > max_height
+      @max_height = z.height
     end
 
     z
@@ -123,16 +125,16 @@ class BST
       end
     else
       #tail: insert the node at his postion
-      z = Node.new(k, p, nil, nil, p.depth + 1)
+      z = Node.new(k, p, nil, nil, p.height + 1)
       if z.key > p.key
         p.r = z
       else
         p.l = z
       end
 
-      # set tree max depth
-      if z.depth > max_depth
-        @max_depth = z.depth
+      # set tree max height
+      if z.height > max_height
+        @max_height = z.height
       end
 
       z
@@ -188,7 +190,7 @@ class BST
 
     v.p = u.p if v
 
-    update_depth(v, u.depth)
+    update_height(v, u.height)
   end
 
   def search(key)
@@ -246,32 +248,7 @@ class BST
   end
 
   def horizontal_tree_walk
-    path = [root]
-    current_depth = 0
-
-    while current = path.shift
-      # depth increased: we print the / \ separator
-      if current.depth > current_depth
-        current_depth += 1
-        print_depth_separator(current_depth)
-      end
-
-      current.render(padding(current.depth))
-
-      if current.l
-        path.push(current.l)
-      elsif current.depth < max_depth
-        path.push(EmptyNode.from_node(current))
-      end
-
-      if current.r
-        path.push(current.r)
-      elsif current.depth < max_depth
-        path.push(EmptyNode.from_node(current))
-      end
-    end
-
-    puts "\n"
+    PrintBinaryTree.new(root, max_height, nil, EmptyNode, ->(node) { node.nil? }).render
   end
 
   def inorder_tree_walk(current)
@@ -304,52 +281,20 @@ class BST
 
   private
 
-  def update_depth(node, depth)
-    node.depth = depth
+  def update_height(node, height)
+    node.height = height
     if node.l
-      update_depth(node.l, depth + 1)
+      update_height(node.l, height + 1)
     end
     if node.r
-      update_depth(node.r, depth + 1)
+      update_height(node.r, height + 1)
     end
   end
 
-  def padding(depth, pad = " ")
-    padding_count(depth).map do |c|
+  def padding(height, pad = " ")
+    padding_count(height).map do |c|
       pad * c
     end
-  end
-
-  def padding_count(depth)
-    # total space occupied by nodes / total nodes / 2
-    padding = (max_span - span_for(depth)) / nodes_count(depth)
-    rem = padding % 2
-    lpad = padding / 2
-    # we add the rounding reminder to the right node if present
-    rpad = rem.zero? ? lpad : lpad + rem
-    [lpad, rpad]
-  end
-
-  def print_depth_separator(depth)
-    print "\n"
-    nodes_count(depth).times do |i|
-      print padding(depth).first
-      print i.even? ? ' / ' : ' \ '
-      print padding(depth).last
-    end
-    print "\n"
-  end
-
-  def max_span
-    span_for(max_depth)
-  end
-
-  def span_for(depth)
-    Node::KEY_SPAN * nodes_count(depth)
-  end
-
-  def nodes_count(depth)
-    (2 ** depth)
   end
 end
 
@@ -378,20 +323,20 @@ def driver
   end
 end
 
-# driver
+driver
 
-# bst = BST.new(RootNode.new(25))
-# bst.insert(5)
-# bst.insert(2)
-# bst.insert(6)
-# bst.insert_r(30)
-# bst.insert(35)
-# bst.insert(15)
-# bst.insert(11)
+bst = BST.new(RootNode.new(25))
+bst.insert(5)
+bst.insert(2)
+bst.insert(6)
+bst.insert_r(30)
+bst.insert(35)
+bst.insert(15)
+bst.insert(11)
 
 
-# puts "Horizontal tree walk:"
-# bst.horizontal_tree_walk
+puts "Horizontal tree walk:"
+bst.horizontal_tree_walk
 
 # puts "Inorder tree walk:"
 # bst.inorder_tree_walk(bst.root)

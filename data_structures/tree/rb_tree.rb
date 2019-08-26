@@ -1,4 +1,5 @@
 require 'readline'
+require_relative '../utils/print_binary_tree.rb'
 
 # Red back tree
 # Is an extended BST. A RB tree node in fact has the property color (c)
@@ -406,45 +407,8 @@ class RBTree
     y
   end
 
-  # pretty prints the tree:
-  #
-  #           41
-  #     /           \
-  #     19          *
-  #  /     \     /     \
-  #  12    31    *     *
-  # /  \  /  \  /  \  /  \
-  #  8 *  *  *  *  *  *  *
-  #
   def horizontal_tree_walk
-    path = [root]
-    current_height = 0
-
-    while current = path.shift
-      next if current.nil_node?
-
-      # height increased: we print the / \ separator
-      if current.height > current_height
-        current_height += 1
-        print_height_separator(current_height)
-      end
-
-      current.render(padding(current.height))
-
-      if !current.l.nil_node?
-        path.push(current.l)
-      elsif current.height < tree_height
-        path.push(EmptyNode.from_node(current, nil_node))
-      end
-
-      if !current.r.nil_node?
-        path.push(current.r)
-      elsif current.height < tree_height
-        path.push(EmptyNode.from_node(current, nil_node))
-      end
-    end
-
-    puts "\n"
+    PrintBinaryTree.new(root, tree_height, nil_node, EmptyNode, ->(node) { node.nil_node? }).render
   end
 
   def inorder_tree_walk(current)
@@ -583,14 +547,6 @@ class RBTree
     x.c = 'b'
   end
 
-  def print_node(node)
-    puts "#{node.as_str} #{ '(root)' if node.key == root.key }"
-  end
-
-  def puts_debug(txt)
-    puts txt if debug
-  end
-
   # updates a node and his childrens height; also recalculates tree_height
   def update_height(node, height)
     puts_debug "Update height, #{node.as_str} dept: #{height}"
@@ -617,47 +573,16 @@ class RBTree
     end
   end
 
-  def padding(height, pad = " ")
-    paddings(height).map do |c|
-      pad * c
-    end
+  def print_node(node)
+    puts "#{node.as_str} #{ '(root)' if node.key == root.key }"
   end
 
-  def paddings(height)
-    # total space occupied by nodes / total nodes
-    padding = (max_span - span_for(height)) / nodes_count(height)
-
-    rem = padding % 2
-    lpad = padding / 2
-    # we add the rounding reminder to the right node if present
-    rpad = rem.zero? ? lpad : lpad + rem
-
-    [lpad, rpad]
-  end
-
-  def max_span
-    span_for(tree_height)
-  end
-
-  def span_for(height)
-    Node::KEY_SPAN * nodes_count(height)
-  end
-
-  def nodes_count(height)
-    (2 ** height)
-  end
-
-  def print_height_separator(height)
-    print "\n"
-    nodes_count(height).times do |i|
-      print padding(height).first
-      print i.even? ? ' / ' : ' \ '
-      print padding(height).last
-    end
-    print "\n"
+  def puts_debug(txt)
+    puts txt if debug
   end
 end
 
+# Drives some examples
 def driver
   rbt = RBTree.new
 
