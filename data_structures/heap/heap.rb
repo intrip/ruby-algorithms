@@ -59,7 +59,7 @@ class Heap
   end
 
   def last_i
-    return 0 if nodes.none?
+    return nil if nodes.none?
 
     nodes.length - 1
   end
@@ -76,6 +76,7 @@ class Heap
   end
 
   def increase_key(i, key)
+    raise "i needs to be >= 0, given: #{i}" if i.nil? || i < 0
     raise "Cannot increase key because the original key is higher" if nodes[i] >= Node.new(key)
 
     nodes[i].key = key
@@ -105,6 +106,20 @@ class Heap
     end
   end
 
+  def extract
+    return nil if nodes.empty?
+
+    swap(0, last_i)
+    res = nodes.pop
+    heapify(0)
+
+    res.key
+  end
+
+  def empty?
+    nodes.empty?
+  end
+
   class << self
     def build(arr)
       heap = new
@@ -116,14 +131,6 @@ class Heap
 
       heap
     end
-  end
-
-  def extract
-    swap(0, last_i)
-    res = nodes.pop
-    heapify(0)
-
-    res.key
   end
 
   private
@@ -161,42 +168,71 @@ class MaxHeap < Heap
   end
 end
 
-puts "Min heap with insert"
-mh = MinHeap.new
-mh.insert(10)
-mh.insert(12)
-mh.insert(2)
-mh.insert(4)
-mh.insert(1)
-mh.insert(15)
-mh.insert(20)
-mh.render
+def driver
+  puts "Min heap with insert"
+  mh = MinHeap.new
+  mh.insert(10)
+  mh.insert(12)
+  mh.insert(2)
+  mh.insert(4)
+  mh.insert(1)
+  mh.insert(15)
+  mh.insert(20)
+  mh.render
 
-puts "Min heap with build"
-mh = MinHeap.new
-mh = MinHeap.build([10,12,2,4,1,15,20])
-mh.render
-puts "Extract min and render"
-puts mh.extract_min
-mh.render
+  puts "Min heap with build"
+  mh = MinHeap.new
+  mh = MinHeap.build([10,12,2,4,1,15,20])
+  mh.render
+  puts "Extract min and render"
+  puts mh.extract_min
+  mh.render
 
-puts "Max heap with insert"
-mh = MaxHeap.new
-mh.insert(10)
-mh.insert(12)
-mh.insert(2)
-mh.insert(4)
-mh.insert(1)
-mh.insert(15)
-mh.insert(20)
-mh.render
+  puts "Max heap with insert"
+  mh = MaxHeap.new
+  mh.insert(10)
+  mh.insert(12)
+  mh.insert(2)
+  mh.insert(4)
+  mh.insert(1)
+  mh.insert(15)
+  mh.insert(20)
+  mh.render
 
-puts "Max heap with build"
-mh = MaxHeap.build([10,12,2,4,1,15,20])
-mh.render
-puts "Delete 12"
-mh.delete(1)
-mh.render
-puts "Extract max and render"
-puts mh.extract_max
-mh.render
+  puts "Max heap with build"
+  mh = MaxHeap.build([10,12,2,4,1,15,20])
+  mh.render
+  puts "Delete 12"
+  mh.delete(1)
+  mh.render
+  puts "Extract max and render"
+  puts mh.extract_max
+  mh.render
+end
+
+def bench
+  puts "Benchmarking insert vs build, build is mostly faster because does less memory allocation."
+
+  require 'benchmark'
+
+  Benchmark.bm do |x|
+    x.report("build") do
+      1000.times do
+        arr = Array.new(100) { rand(1000) }
+        MaxHeap.build(arr)
+      end
+    end
+
+    x.report("insert") do
+      1000.times do
+        arr = Array.new(100) { rand(1000) }
+        MaxHeap.new.tap do |mh|
+          arr.each { |i| mh.insert(i) }
+        end
+      end
+    end
+  end
+end
+
+# driver
+# bench
