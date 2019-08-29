@@ -61,7 +61,7 @@ arr = [13,-3,-25,20,-3,-16,-23,18,20,-7,12,-5,-22,15,-4,7]
 require 'benchmark'
 Benchmark.bm do |x|
   x.report("max_subarray_brute: ") { for i in 1..10000; max_subarray_brute(arr) end}
-  x.report("max_subarray_opt: ") { for i in 1..10000; max_subarray_opt(arr) end}
+  x.report("max_subarray_opt: ") { for i in 1..10000; max_subarray_opt(arr) end;}
 end
 
 p max_subarray_brute(arr)
