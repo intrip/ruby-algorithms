@@ -2,7 +2,7 @@ require_relative '../utils/print_binary_tree.rb'
 require 'byebug'
 
 class Node
-  KEY_SPAN = 4
+  KEY_SPAN = 3
 
   attr_reader :key
   attr_accessor :p, :l, :r, :b, :height
@@ -17,7 +17,7 @@ class Node
   end
 
   def render(padding)
-    print pad(*padding, "#{key}.#{b}".rjust(Node::KEY_SPAN))
+    print pad(*padding, "#{key}_#{b}@#{height}")
   end
 
   def ==(other = nil)
@@ -80,11 +80,12 @@ class AVLTree
       end
     end
 
-    balance(z)
     # set tree max height
     if z.height > max_height
       @max_height = z.height
     end
+
+    avl_fixup(z)
 
     z
   end
@@ -227,7 +228,7 @@ class AVLTree
     end
   end
 
-  def balance(z)
+  def avl_fixup(z)
     grandparent = z.p&.p
     return if !grandparent
     return if grandparent.b < 2 && grandparent.b > -2
@@ -248,7 +249,7 @@ class AVLTree
         update_height(parent, z.height)
       end
 
-      # TODO fix balance values here but also on rotations
+      # TODO fix balance values here but also on rotations at first
       # also reduce tree max height on rotation (fix commented code)
       rotate_r(grandparent)
     else
@@ -257,26 +258,19 @@ class AVLTree
     end
   end
 
-  # fixes the balance of a node and all his parents up to the root
-  def fix_balance_leaf(z)
-
-  end
-
   def puts_debug(txt)
     puts txt if debug
   end
 end
 
 avl = AVLTree.new(nil, true)
-avl.insert(38)
-avl.insert(19)
-avl.insert(41)
-avl.insert(12)
-avl.insert(13)
+[38, 19, 41, 12, 13].each do |i|
+  avl.insert(i)
+  avl.horizontal_tree_walk
+  readline
+end
 
 # avl.rotate_r(avl.search(19))
 # TODO
 # implement the balance and rotation
 # recalculate balance and height after rotation too
-avl.horizontal_tree_walk
-
