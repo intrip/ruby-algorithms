@@ -84,9 +84,38 @@ def bottom_view(root)
     end
   end
 
+  # p nodes_by_height.map { |k,v| [k, v.k] }
   i = min_height
   while nodes_by_height[i] do
     print "#{nodes_by_height[i].k} "
+    i += 1
+  end
+end
+
+# this function is tail recursive and can benefit from Tail recursive optimization
+def build_nodes_by_height(node, hor_height, height, nodes_by_height = {})
+  if node.l
+    build_nodes_by_height(node.l, hor_height - 1, height + 1, nodes_by_height)
+  end
+
+  # overwrite only if node has higher height
+  if nodes_by_height[hor_height].nil? || nodes_by_height[hor_height][1] <= height
+    nodes_by_height[hor_height] = [node, height]
+  end
+
+  if node.r
+    build_nodes_by_height(node.r, hor_height + 1, height + 1, nodes_by_height)
+  end
+end
+
+def bottom_view_rec(root)
+  nodes_by_height = {}
+  build_nodes_by_height(root, 0, 0, nodes_by_height)
+
+  # p nodes_by_height.map { |k,v| [k, v.k] }
+  i = nodes_by_height.keys.min
+  while nodes_by_height[i] do
+    print "#{nodes_by_height[i][0].k} "
     i += 1
   end
 end
@@ -104,3 +133,5 @@ root = Node.new(10, n_20, n_30)
 
 bottom_view(root)
 # expected: 40 20 60 30
+print "\n"
+bottom_view_rec(root)

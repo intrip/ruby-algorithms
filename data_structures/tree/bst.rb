@@ -24,10 +24,6 @@ class Node
     print pad(*padding, key.to_s.rjust(Node::KEY_SPAN))
   end
 
-  def null_node?
-    false
-  end
-
   def ==(other = nil)
     return false unless other
 
@@ -56,10 +52,6 @@ class EmptyNode < Node
     def from_node(node, nil_node)
       self.new(nil_node, node, nil_node, nil_node, node.height + 1)
     end
-  end
-
-  def null_node?
-    true
   end
 
   def render(padding)

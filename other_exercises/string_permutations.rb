@@ -50,9 +50,12 @@ def permutations(str)
   res
 end
 
-# using dynamic programming we can reduce his computation time to O(n!)
+# using memoizing we can speedup his computation but it still takes O(n!)
 def permutations_memo(str, memo = {})
-  return memo[str] if memo[str]
+  if memo[str]
+    p "found #{str}"
+    return memo[str]
+  end
 
   len = str.length
   if len == 1
@@ -79,9 +82,9 @@ p a, b, a == b, b == c
 
 require 'benchmark'
 
-Benchmark.bm do |x|
-  x.report("get_permutations") { get_permutations("123456789") }
-  x.report("permutations") { permutations("123456789") }
-  x.report("permutations_memo") { permutations_memo("123456789") }
-end
+# Benchmark.bm do |x|
+#   x.report("get_permutations") { get_permutations("123456789") }
+#   x.report("permutations") { permutations("123456789") }
+#   x.report("permutations_memo") { permutations_memo("123456789") }
+# end
 

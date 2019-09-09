@@ -51,6 +51,7 @@ p solution_dp(p, p.length)
 p solution_dp_bu(p, p.length)
 p solution(p, p.length)
 
+{ 'a' => 'b', 'c' => 'd' }
 require 'benchmark'
 
 Benchmark.bmbm do |x|
