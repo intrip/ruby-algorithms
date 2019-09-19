@@ -13,7 +13,7 @@ def solution(p, n)
   end
 end
 
-# uses dynamic programming (top to bottom using memoizing) and solves problem in O(n) time
+# uses dynamic programming (top to bottom using memoizing) and solves problem in O(n^2) time
 def solution_dp(p, n, memo = [])
   return 0 if n <= 0
   return memo[n] if memo[n]
@@ -23,7 +23,7 @@ def solution_dp(p, n, memo = [])
   end
 end
 
-# uses dynamic programming (bottom to top) and solves problem in O(n) time
+# uses dynamic programming (bottom to top) and solves problem in O(n^2) time
 def solution_dp_bu(p, n)
   dp = Array.new(n, MIN_INT)
   # we set p[0] and dp[0] to 0

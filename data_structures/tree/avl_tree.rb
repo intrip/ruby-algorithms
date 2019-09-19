@@ -1,11 +1,16 @@
 require 'byebug'
 require 'forwardable'
+require_relative '../utils/print_binary_tree.rb'
 
 class Node
   UNDEFINED = Object.new
+  NODE_SPAN = 3
 
   attr_reader :key, :val, :height
   attr_accessor :left, :right
+
+  alias :l :left
+  alias :r :right
 
   def initialize(key, val)
     @key = key
@@ -14,6 +19,7 @@ class Node
     @left = @right = EMPTY
   end
 
+  # compact rapresentation of the subtree
   def dump
     has_childrens = !left.empty? || !right.empty?
     res = key.to_s
@@ -24,6 +30,11 @@ class Node
       res += ")"
     end
     res
+  end
+
+  # used for pretty_print
+  def render(padding)
+    print pad(*padding, key.to_s.rjust(NODE_SPAN))
   end
 
   # Calls block in order
@@ -257,6 +268,10 @@ class Node
       successor
     end
   end
+
+  def pad(lpad, rpad, str)
+    lpad + str + rpad
+  end
 end
 
 class EmptyNode < Node
@@ -272,6 +287,10 @@ class EmptyNode < Node
     ''
   end
 
+  def render(padding)
+    print pad(*padding, ' * ')
+  end
+
   def get(key)
     UNDEFINED
   end
@@ -282,6 +301,12 @@ class EmptyNode < Node
 
   def rotate
     self
+  end
+
+  class << self
+    def from_node(*args)
+      new
+    end
   end
 end
 EMPTY = EmptyNode.new.freeze
@@ -296,6 +321,12 @@ class AVLTree
   def initialize(default_value = nil)
     @root = EmptyNode.new
     @default_value = default_value
+  end
+
+  def pretty_print
+    height = root.height
+    height = 0 if root.height < 0
+    PrintBinaryTree.new(root, height, EMPTY, Node::NODE_SPAN, ->(node) { node.nil? }).render
   end
 
   def insert(key, val)
@@ -319,20 +350,30 @@ class AVLTree
   end
 end
 
-avl = AVLTree.new
-[[38,1], [19,2], [41,3], [12,4], [13,5], [20,6], [21,7]].each do |k,v|
-  avl[k] = v
-  puts avl.dump
-  avl.validate!
-  # readline
+def build_tree(data)
+  avl = AVLTree.new
+  data.each do |k,v|
+    puts "Adding #{k},#{v}\n\n"
+    avl[k] = v
+    puts "#{avl.dump}\n\n"
+    puts avl.pretty_print
+    avl.validate!
+    readline
+  end
+  avl
 end
+
+puts "Here we create a random tree:"
+avl = build_tree([[38,1], [19,2], [41,3], [12,4], [13,5], [20,6], [21,7]])
 
 puts "delete 12"
 avl.delete(12)
-puts avl.dump
+puts avl.pretty_print
+readline
 puts "delete 20"
 avl.delete(20)
-puts avl.dump
+puts avl.pretty_print
+readline
 avl.validate!
 puts "each"
 avl.each do |n|
@@ -343,4 +384,9 @@ p avl.min
 puts "max"
 p avl.max
 
-# TODO tweak print to show AVL
+puts "Here we create an unbalanced tree and let RBTree fix that:"
+avl = build_tree((1..20).zip(1..20))
+
+
+# TODO extract the print logic into the print node class so that we can cleanup this
+# also remove the height for bst and rbt

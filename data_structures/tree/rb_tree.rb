@@ -407,8 +407,8 @@ class RBTree
     y
   end
 
-  def horizontal_tree_walk
-    PrintBinaryTree.new(root, tree_height, nil_node, EmptyNode, ->(node) { node.nil_node? }).render
+  def pretty_print
+    PrintBinaryTree.new(root, tree_height, nil_node, Node::KEY_SPAN, ->(node) { node.nil_node? }).render
   end
 
   def inorder_tree_walk(current)
@@ -594,16 +594,16 @@ def driver
 
     keys << k
     rbt.insert(k)
-    rbt.horizontal_tree_walk
+    rbt.pretty_print
     puts rbt.balance_info
     readline
   end
 
   puts "Here we create an unbalanced tree and let RBTree fix that:"
   rbt = RBTree.new
-  (1..15).each do |i|
+  (1..20).each do |i|
     rbt.insert(i)
-    rbt.horizontal_tree_walk
+    rbt.pretty_print
     puts rbt.balance_info
     readline
   end
@@ -619,19 +619,19 @@ end
 # rbt.debug = true
 
 # Manual tests:
-rbt.horizontal_tree_walk
+rbt.pretty_print
 
 # puts "transplant 19 => 31"
 # rbt.transplant(rbt.search(19), rbt.search(31))
-# rbt.horizontal_tree_walk
+# rbt.pretty_print
 # puts rbt.balance_info
 
 puts "left rotate root"
 rbt.rotate_l(rbt.root)
-rbt.horizontal_tree_walk
+rbt.pretty_print
 puts "right rotate (41)"
 rbt.rotate_r(rbt.search(41))
-rbt.horizontal_tree_walk
+rbt.pretty_print
 
 puts "\nInorder tree walk:"
 rbt.inorder_tree_walk(rbt.root)
@@ -642,21 +642,21 @@ rbt.postorder_tree_walk(rbt.root)
 
 puts "Deleting node 8"
 rbt.delete(rbt.search(8))
-rbt.horizontal_tree_walk
+rbt.pretty_print
 puts "Deleting node 12"
 rbt.delete(rbt.search(12))
-rbt.horizontal_tree_walk
+rbt.pretty_print
 puts "Deleting node 19"
 rbt.delete(rbt.search(19))
-rbt.horizontal_tree_walk
+rbt.pretty_print
 puts "Deleting node 31"
 rbt.delete(rbt.search(31))
-rbt.horizontal_tree_walk
+rbt.pretty_print
 puts "Deleting node 38"
 rbt.delete(rbt.search(38))
-rbt.horizontal_tree_walk
+rbt.pretty_print
 puts "Deleting node 41"
 rbt.delete(rbt.search(41))
-rbt.horizontal_tree_walk
+rbt.pretty_print
 
 # TODO: handle when deleting a leaf should reduce the tree.tree_height as well

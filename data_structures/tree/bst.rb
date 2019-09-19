@@ -239,8 +239,8 @@ class BST
     y
   end
 
-  def horizontal_tree_walk
-    PrintBinaryTree.new(root, max_height, nil, EmptyNode, ->(node) { node.nil? }).render
+  def pretty_print
+    PrintBinaryTree.new(root, max_height, nil, Node::KEY_SPAN, ->(node) { node.nil? }).render
   end
 
   def inorder_tree_walk(current)
@@ -302,15 +302,15 @@ def driver
 
     keys << k
     rbt.insert(k)
-    rbt.horizontal_tree_walk
+    rbt.pretty_print
     readline
   end
 
   puts "Here we create an unbalanced tree:"
   rbt = BST.new
-  (1..6).each do |i|
+  (1..10).each do |i|
     rbt.insert(i)
-    rbt.horizontal_tree_walk
+    rbt.pretty_print
     readline
   end
 end
@@ -328,7 +328,7 @@ bst.insert(11)
 
 
 puts "Horizontal tree walk:"
-bst.horizontal_tree_walk
+bst.pretty_print
 
 # puts "Inorder tree walk:"
 # bst.inorder_tree_walk(bst.root)
@@ -348,7 +348,7 @@ bst.horizontal_tree_walk
 # puts "Predecessor 25:"
 # bst.print_node(bst.predecessor(bst.search(25)))
 
-# bst.horizontal_tree_walk
+# bst.pretty_print
 # puts "Delete node: 25"
 # bst.delete(bst.search(25))
-# bst.horizontal_tree_walk
+# bst.pretty_print

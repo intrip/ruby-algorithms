@@ -1,15 +1,14 @@
 # Prints a binary tree
 class PrintBinaryTree
-  attr_reader :root, :max_height, :nil_node, :empty_node_class, :nil_node_proc
+  attr_reader :root, :max_height, :nil_node, :nil_node_proc, :key_span
 
-  # A Node needs to respond to: :height, :render
-  # Node needs also to have a KEY_SPAN constant
-  def initialize(root, max_height, nil_node, empty_node_class, nil_node_proc)
+  # A Node needs to respond to: :render
+  def initialize(root, max_height, nil_node, key_span, nil_node_proc)
     @root = root
     @max_height = max_height
     @nil_node = nil_node
-    @empty_node_class = empty_node_class
     @nil_node_proc = nil_node_proc
+    @key_span = key_span
   end
 
   # pretty prints the tree:
@@ -23,35 +22,35 @@ class PrintBinaryTree
   #  8 *  *  *  *  *  *  *
   #
   def render
-    path = [root]
+    path = [[root,0]]
     current_height = 0
 
-    while current = path.shift
+    while (current, height = path.shift)
       next if nil_node_proc.call(current)
 
       # height increased: we print the / \ separator
-      if current.height > current_height
+      if height > current_height
         current_height += 1
         print_height_separator(current_height)
       end
 
-      current.render(padding(current.height))
+      current.render(padding(height))
 
       # navigate left
       if !nil_node_proc.call(current.l)
-        path.push(current.l)
-      elsif current.height < max_height
-        path.push(EmptyNode.from_node(current, nil_node))
+        path.push([current.l, height + 1])
+      elsif height < max_height
+        path.push([EmptyNode.from_node(current, nil_node), height + 1])
       end
 
       # navigate right
       if !nil_node_proc.call(current.r)
-        path.push(current.r)
-      elsif current.height < max_height
-        path.push(EmptyNode.from_node(current, nil_node))
+        path.push([current.r, height + 1])
+      elsif height < max_height
+        path.push([EmptyNode.from_node(current, nil_node), height + 1])
       end
     end
-    puts "\n\n"
+    puts "\n"
   end
 
   private
@@ -61,7 +60,7 @@ class PrintBinaryTree
   end
 
   def span_for(height)
-    root.class::KEY_SPAN * nodes_count(height)
+    key_span * nodes_count(height)
   end
 
   def nodes_count(height)
