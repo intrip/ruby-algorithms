@@ -49,8 +49,8 @@ end
 
 class EmptyNode < Node
   class << self
-    def from_node(node, nil_node)
-      self.new(nil_node, node, nil_node, nil_node, node.height + 1)
+    def from_node(node)
+      self.new(nil, node, nil, nil, node.height + 1)
     end
   end
 
@@ -240,7 +240,7 @@ class BST
   end
 
   def pretty_print
-    PrintBinaryTree.new(root, max_height, nil, Node::KEY_SPAN, ->(node) { node.nil? }).render
+    PrintBinaryTree.new(root, max_height, Node::KEY_SPAN, ->(node) { node.nil? }).render
   end
 
   def inorder_tree_walk(current)
@@ -294,7 +294,7 @@ end
 def driver
   rbt = BST.new
 
-  puts "Here we create a random tree:"
+  puts "Here we create a random BST:"
   keys = []
   10.times do |i|
     k = rand(100)
@@ -306,7 +306,7 @@ def driver
     readline
   end
 
-  puts "Here we create an unbalanced tree:"
+  puts "Here we create an unbalanced BST:"
   rbt = BST.new
   (1..10).each do |i|
     rbt.insert(i)

@@ -26,7 +26,7 @@ class Node
     if has_childrens
       res += "("
       res += "#{left.dump}," unless left.empty?
-      res += "#{right.dump}" unless right.empty?
+      res += right.dump unless right.empty?
       res += ")"
     end
     res
@@ -94,7 +94,7 @@ class Node
 
   def min
     if left.empty?
-      val
+      key
     else
       left.min
     end
@@ -102,7 +102,7 @@ class Node
 
   def max
     if right.empty?
-      val
+      key
     else
       right.max
     end
@@ -326,7 +326,7 @@ class AVLTree
   def pretty_print
     height = root.height
     height = 0 if root.height < 0
-    PrintBinaryTree.new(root, height, EMPTY, Node::NODE_SPAN, ->(node) { node.nil? }).render
+    PrintBinaryTree.new(root, height, Node::NODE_SPAN, ->(node) { node.nil? }).render
   end
 
   def insert(key, val)
@@ -355,7 +355,8 @@ def build_tree(data)
   data.each do |k,v|
     puts "Adding #{k},#{v}\n\n"
     avl[k] = v
-    puts "#{avl.dump}\n\n"
+    puts "dump: #{avl.dump}\n\n"
+    puts "pretty print:\n\n"
     puts avl.pretty_print
     avl.validate!
     readline
@@ -363,7 +364,7 @@ def build_tree(data)
   avl
 end
 
-puts "Here we create a random tree:"
+puts "Here we create a random AVLTree:"
 avl = build_tree([[38,1], [19,2], [41,3], [12,4], [13,5], [20,6], [21,7]])
 
 puts "delete 12"
@@ -384,9 +385,6 @@ p avl.min
 puts "max"
 p avl.max
 
-puts "Here we create an unbalanced tree and let RBTree fix that:"
+puts "Here we create an unbalanced AVLTree and let AVLTree fix that:"
 avl = build_tree((1..20).zip(1..20))
-
-
-# TODO extract the print logic into the print node class so that we can cleanup this
-# also remove the height for bst and rbt
+puts "Done."

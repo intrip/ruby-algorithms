@@ -110,9 +110,9 @@ class EmptyNode < Node
   LIGHT_GRAY = 2
 
   class << self
-    def from_node(node, nil_node)
+    def from_node(node)
       # empty node has no color
-      self.new(nil, node, nil_node, nil_node, '', node.height + 1)
+      self.new(nil, node, NilNode.new, NilNode.new, '', node.height + 1)
     end
   end
 
@@ -408,7 +408,7 @@ class RBTree
   end
 
   def pretty_print
-    PrintBinaryTree.new(root, tree_height, nil_node, Node::KEY_SPAN, ->(node) { node.nil_node? }).render
+    PrintBinaryTree.new(root, tree_height, Node::KEY_SPAN, ->(node) { node.nil_node? }).render
   end
 
   def inorder_tree_walk(current)
@@ -586,7 +586,7 @@ end
 def driver
   rbt = RBTree.new
 
-  puts "Here we create a random tree:"
+  puts "Here we create a random RBTree:"
   keys = []
   15.times do |i|
     k = rand(100)
@@ -599,7 +599,7 @@ def driver
     readline
   end
 
-  puts "Here we create an unbalanced tree and let RBTree fix that:"
+  puts "Here we create an unbalanced RBTree and let RBTree fix that:"
   rbt = RBTree.new
   (1..20).each do |i|
     rbt.insert(i)
@@ -659,4 +659,5 @@ puts "Deleting node 41"
 rbt.delete(rbt.search(41))
 rbt.pretty_print
 
-# TODO: handle when deleting a leaf should reduce the tree.tree_height as well
+# TODO insead of saving the height save max height of childrens as we do in avl so that you can update it easily
+# also when you remove a leaf > this allow to reduce the max_height when removing the last leaf

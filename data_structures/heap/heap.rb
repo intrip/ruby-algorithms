@@ -53,9 +53,20 @@ class Heap
     (i + 1) / 2 - 1
   end
 
-  def render
-    print nodes.map(&:key).join(' ')
-    print "\n"
+  def dump(i = 0)
+    return 'empty heap' unless nodes.any?
+
+    res = nodes[i].key.to_s
+
+    has_childrens = nodes[left(i)] || nodes[right(i)]
+    if has_childrens
+      res += "("
+      res += "#{dump(left(i))}," if nodes[left(i)]
+      res += dump(right(i)) if nodes[right(i)]
+      res += ")"
+    end
+
+    res
   end
 
   def last_i
@@ -178,15 +189,15 @@ def driver
   mh.insert(1)
   mh.insert(15)
   mh.insert(20)
-  mh.render
+  puts mh.dump
 
   puts "Min heap with build"
   mh = MinHeap.new
   mh = MinHeap.build([10,12,2,4,1,15,20])
-  mh.render
-  puts "Extract min and render"
+  puts mh.dump
+  puts "Extract min and dump"
   puts mh.extract_min
-  mh.render
+  puts mh.dump
 
   puts "Max heap with insert"
   mh = MaxHeap.new
@@ -197,17 +208,17 @@ def driver
   mh.insert(1)
   mh.insert(15)
   mh.insert(20)
-  mh.render
+  puts mh.dump
 
   puts "Max heap with build"
   mh = MaxHeap.build([10,12,2,4,1,15,20])
-  mh.render
+  puts mh.dump
   puts "Delete 12"
   mh.delete(1)
-  mh.render
-  puts "Extract max and render"
+  puts mh.dump
+  puts "Extract max and dump"
   puts mh.extract_max
-  mh.render
+  puts mh.dump
 end
 
 def bench
@@ -234,5 +245,5 @@ def bench
   end
 end
 
-# driver
+driver
 # bench

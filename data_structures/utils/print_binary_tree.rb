@@ -1,12 +1,11 @@
 # Prints a binary tree
 class PrintBinaryTree
-  attr_reader :root, :max_height, :nil_node, :nil_node_proc, :key_span
+  attr_reader :root, :max_height, :nil_node_proc, :key_span
 
   # A Node needs to respond to: :render
-  def initialize(root, max_height, nil_node, key_span, nil_node_proc)
+  def initialize(root, max_height, key_span, nil_node_proc)
     @root = root
     @max_height = max_height
-    @nil_node = nil_node
     @nil_node_proc = nil_node_proc
     @key_span = key_span
   end
@@ -27,6 +26,8 @@ class PrintBinaryTree
 
     while (current, height = path.shift)
       next if nil_node_proc.call(current)
+      # don't print empty leafs
+      next if height >= max_height
 
       # height increased: we print the / \ separator
       if height > current_height
@@ -40,14 +41,14 @@ class PrintBinaryTree
       if !nil_node_proc.call(current.l)
         path.push([current.l, height + 1])
       elsif height < max_height
-        path.push([EmptyNode.from_node(current, nil_node), height + 1])
+        path.push([EmptyNode.from_node(current), height + 1])
       end
 
       # navigate right
       if !nil_node_proc.call(current.r)
         path.push([current.r, height + 1])
       elsif height < max_height
-        path.push([EmptyNode.from_node(current, nil_node), height + 1])
+        path.push([EmptyNode.from_node(current), height + 1])
       end
     end
     puts "\n"
