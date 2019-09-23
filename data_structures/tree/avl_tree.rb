@@ -350,18 +350,18 @@ class AVLTree
   end
 end
 
-def build_tree(data)
-  avl = AVLTree.new
-  data.each do |k,v|
-    puts "Adding #{k},#{v}\n\n"
-    avl[k] = v
-    puts "dump: #{avl.dump}\n\n"
-    puts "pretty print:\n\n"
-    puts avl.pretty_print
-    avl.validate!
-    readline
+def build_tree(nodes)
+  AVLTree.new.tap do |avl|
+    nodes.each do |k,v|
+      puts "Adding #{k},#{v}\n\n"
+      avl[k] = v
+      puts "dump: #{avl.dump}\n\n"
+      puts "pretty print:\n\n"
+      puts avl.pretty_print
+      avl.validate!
+      readline
+    end
   end
-  avl
 end
 
 puts "Here we create a random AVLTree:"
@@ -376,7 +376,7 @@ avl.delete(20)
 puts avl.pretty_print
 readline
 avl.validate!
-puts "each"
+puts "#each"
 avl.each do |n|
   p n.key
 end

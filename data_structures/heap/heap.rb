@@ -179,46 +179,46 @@ class MaxHeap < Heap
   end
 end
 
+def build_heap(klass, nodes)
+  klass.new.tap do |heap|
+    nodes.each do |k|
+      puts "Adding #{k}\n\n"
+      heap.insert(k)
+      puts "dump: #{heap.dump}\n\n"
+      readline
+    end
+  end
+end
 def driver
+  nodes = [10, 12, 2, 4, 1, 15, 20]
   puts "Min heap with insert"
-  mh = MinHeap.new
-  mh.insert(10)
-  mh.insert(12)
-  mh.insert(2)
-  mh.insert(4)
-  mh.insert(1)
-  mh.insert(15)
-  mh.insert(20)
-  puts mh.dump
+  build_heap(MinHeap, nodes)
 
   puts "Min heap with build"
   mh = MinHeap.new
   mh = MinHeap.build([10,12,2,4,1,15,20])
   puts mh.dump
+  readline
   puts "Extract min and dump"
   puts mh.extract_min
   puts mh.dump
+  readline
 
   puts "Max heap with insert"
-  mh = MaxHeap.new
-  mh.insert(10)
-  mh.insert(12)
-  mh.insert(2)
-  mh.insert(4)
-  mh.insert(1)
-  mh.insert(15)
-  mh.insert(20)
-  puts mh.dump
+  build_heap(MaxHeap, nodes)
 
   puts "Max heap with build"
   mh = MaxHeap.build([10,12,2,4,1,15,20])
   puts mh.dump
+  readline
   puts "Delete 12"
   mh.delete(1)
+  readline
   puts mh.dump
   puts "Extract max and dump"
   puts mh.extract_max
   puts mh.dump
+  readline
 end
 
 def bench
@@ -246,4 +246,5 @@ def bench
 end
 
 driver
-# bench
+bench
+puts 'Done.'
