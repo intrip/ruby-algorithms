@@ -20,6 +20,19 @@ class LinkedList
     end
   end
 
+  def dump
+    res = ''
+    current = @head
+
+    while current
+      res << "#{current.inspect}"
+      res << ' -> ' if current.next
+      current = current.next
+    end
+
+    res
+  end
+
   def delete(item)
     # deleting the head
     if item.key == @head.key
@@ -60,25 +73,28 @@ class LinkedList
   end
 end
 
+def build_list(nodes)
+  LinkedList.new.tap do |list|
+    nodes.each do |k, v|
+      puts "Adding #{k},#{v}\n\n"
+      list.insert(k, v)
+      puts "dump: #{list.dump}\n\n"
+      readline
+    end
+  end
+end
+
 # Create the LinkedList
-ll = LinkedList.new
-l1 = ll.insert(1,1)
-l2 = ll.insert(2,2)
-l3 = ll.insert(3,3)
-l4 = ll.insert(4,4)
-l5 = ll.insert(5,5)
+ll = build_list([[1,1], [2,2], [3,3], [4,4], [5,5]])
 
-puts ll
+puts "deleting 2"
+ll.delete(ll.search(2))
+puts ll.dump
+readline
 
-puts "deleting l2"
-ll.delete(l2)
+puts "deleting 5(head)"
+ll.delete(ll.search(5))
+puts ll.dump
+readline
 
-puts ll
-
-puts "deleting l5 (head)"
-ll.delete(l5)
-
-puts ll
-
-puts "Searching 3"
-puts ll.search(3).inspect
+puts "Done."
