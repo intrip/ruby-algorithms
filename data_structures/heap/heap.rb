@@ -1,5 +1,3 @@
-require 'byebug'
-
 class Node
   include Comparable
 
@@ -25,6 +23,20 @@ class Node
   end
 end
 
+# A Heap is a special Tree-based data structure in which the tree is a complete binary tree. Generally, Heaps can be of two types:
+# Max-Heap: In a Max-Heap the key present at the root node must be greatest among the keys present at all of it’s children.
+#           The same property must be recursively true for all sub-trees in that Binary Tree.
+# Min-Heap: In a Min-Heap the key present at the root node must be minimum among the keys present at all of it’s children.
+#           The same property must be recursively true for all sub-trees in that Binary Tree.
+#
+# Example of Min-Heap
+#
+#            10                      10
+#         /      \               /       \
+#       20        100          15         30
+#      /                      /  \        /  \
+#    30                     40    50    100   40
+#
 class Heap
   INF = Object.new
   MINUS_INF = Object.new
@@ -189,6 +201,7 @@ def build_heap(klass, nodes)
     end
   end
 end
+
 def driver
   nodes = [10, 12, 2, 4, 1, 15, 20]
   puts "Min heap with insert"
