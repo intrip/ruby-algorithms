@@ -11,6 +11,7 @@ class LinkedList
   end
 
   # insert an item as new head
+  # takes O(1) time
   def insert(key, val)
     if @head == nil
       @head = ListItem.new(key, val, nil)
@@ -33,6 +34,8 @@ class LinkedList
     res
   end
 
+  # deletes a given node
+  # Takes O(n) time
   def delete(item)
     # deleting the head
     if item.key == @head.key
@@ -48,6 +51,8 @@ class LinkedList
     current.next = item.next
   end
 
+  # searches and returns an element in the node
+  # takes O(n) time
   def search(key)
     current = @head
 
@@ -96,5 +101,29 @@ puts "deleting 5(head)"
 ll.delete(ll.search(5))
 puts ll.dump
 readline
+
+require 'benchmark'
+
+Benchmark.bm do |x|
+  data = Array.new(1000) { [rand(1000), rand(1000)] }
+  x.report('linked list') do
+    1_000.times do
+      LinkedList.new.tap do |list|
+        data.each do |k, v|
+          list.insert(k, v)
+        end
+      end
+    end
+  end
+
+  x.report('array') do
+    1_000.times do
+      arr = []
+      data.each do |k,v|
+        arr << [k,v]
+      end
+    end
+  end
+end
 
 puts "Done."
