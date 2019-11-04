@@ -49,18 +49,28 @@ def optimal_bst(p, q, n)
   [e, root]
 end
 
-def print_optimal_bst(e, root, i, j)
+require 'byebug'
+def print_optimal_bst(root, i, j, parent = nil, direction = nil)
   k = root.dig(i, j)
-  return if k.nil? || k < 1 || k > j
 
-  print "#{k},("
-  print_optimal_bst(e, root, i, k - 1)
-  print_optimal_bst(e, root, k + 1, j)
-  print ')'
+  if i > j
+    puts "d#{i - 1} is #{direction} child of k#{parent}"
+    return
+  end
+
+  print "k#{k} is the "
+  if parent.nil?
+    puts "root"
+  else
+    puts "#{direction} child of k#{parent}"
+  end
+
+  print_optimal_bst(root, i, k - 1, k, 'left')
+  print_optimal_bst(root, k + 1, j, k, 'right')
 end
 
 pi = [nil, 0.15, 0.10, 0.05, 0.10, 0.20]
 qi = [0.05, 0.10, 0.05, 0.05, 0.05, 0.10]
 e, root = optimal_bst(pi, qi, 5)
 
-print_optimal_bst(e, root, 1, 5)
+print_optimal_bst(root, 1, 5)
