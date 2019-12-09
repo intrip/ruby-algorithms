@@ -3,8 +3,11 @@
 
 require_relative './graph.rb'
 
-INF = Float::INFINITY
+# BFS computes the distance of every verext from a given vertex.
+# The time complexity is O(V + E).
 class Graph
+  INF = Float::INFINITY
+
   def bfs(start)
     vertices.each do |v|
       v.c = 'w'
@@ -24,6 +27,24 @@ class Graph
       u.c = 'b'
     end
   end
+
+  # prints all the path from a vertex back to v
+  def print_path(u, v)
+    stack = [u]
+
+    while u = stack.pop
+      if u.id == v.id
+        print u.id
+      elsif u.prev == nil
+        puts "no path from #{u.id} to #{v.id}"
+      else
+        print "#{u.id} --➡️  "
+      end
+
+      stack.push u.prev
+    end
+    print "\n"
+  end
 end
 
 class Vertex
@@ -42,6 +63,12 @@ end
 
 g = build_graph
 g.bfs(g.vertices[0])
+
 g.vertices.each do |v|
   p v
 end
+
+g.vertices.each do |v|
+  g.print_path(v, g.vertices[0])
+end
+

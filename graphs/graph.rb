@@ -40,7 +40,7 @@ end
 #                |        |
 #                |        |
 #               ⬇️        ⬇️ 
-#               (4) --➡️ (5)
+#               (4) --➡️  (5) --➡️  (6)
 #
 def build_graph
   v1 = Vertex.new(1)
@@ -48,12 +48,14 @@ def build_graph
   v3 = Vertex.new(3)
   v4 = Vertex.new(4)
   v5 = Vertex.new(5)
-  g = Graph.new([v1, v2, v3, v4, v5])
+  v6 = Vertex.new(6)
+  g = Graph.new([v1, v2, v3, v4, v5, v6])
   g.add_edge(v1, v2)
   g.add_edge(v2, v3)
   g.add_edge(v2, v4)
   g.add_edge(v3, v5)
   g.add_edge(v4, v5)
+  g.add_edge(v5, v6)
 
   g
 end
