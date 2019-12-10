@@ -3,6 +3,8 @@
 
 # This is a graph implemented using ajacency-list.
 # We assume vertex indexes are unque.
+# We consider the Graph as directed, to make it undirected we need to
+# add a link in the Adj from both (u,v) and (v,u) with #add_edge.
 class Graph
   attr_accessor :vertices, :adj
 
@@ -13,6 +15,18 @@ class Graph
 
   def add_edge(from, to)
     adj[vertices.index(from)] << to
+  end
+
+  # Returns a new transposed the graph
+  # with all the edges inverted.
+  def t
+    adj_t = Array.new(vertices.length) { [] }
+    adj.each_with_index do |adj_j, j|
+      adj_j.each do |v|
+        adj_t[vertices.index(v)] << vertices[j]
+      end
+    end
+    dup.tap { |g| g.adj = adj_t }
   end
 
   def dump
@@ -62,3 +76,5 @@ end
 
 # g = build_graph
 # puts g.dump
+# puts
+# puts g.t.dump
