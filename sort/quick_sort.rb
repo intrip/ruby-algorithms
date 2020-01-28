@@ -13,7 +13,7 @@ array as pivot, put x at its correct position in sorted array and put all smalle
 
 def partition(arr,start,to)
   pivot = arr[to]
-  # lower part
+  # Lower part
   li = start
 
   for ui in li..(to-1)
@@ -23,12 +23,15 @@ def partition(arr,start,to)
     end
   end
 
-  # move the pivot in middle
+  # Move the pivot in middle
   arr[li],arr[to]=arr[to],arr[li]
   li
 end
 
 def quick_sort(arr,start=0, to=nil)
+  # If the array is sorted just return it to avoid the (n^2) worst case.
+  return arr if to.nil? && sorted?(arr)
+
   to = arr.length() -1 if to.nil?
 
   return if start >= to
@@ -40,6 +43,22 @@ def quick_sort(arr,start=0, to=nil)
   arr
 end
 
+def sorted?(arr)
+  i = 0
+  j = i + 1
+  len = arr.length
+  while j < len
+    if arr[i] > arr[j]
+      return false
+    end
+    i += 1
+    j += 1
+  end
+
+  true
+end
+
+
 arr = [3, 4, 5, 1, 2]
 
 times = 10 ** 6
@@ -50,3 +69,9 @@ end
 
 puts "arr #{arr}"
 puts "Quick sort: #{quick_sort(arr.clone)}"
+
+# arr2 = Array.new(1_000) { rand(100000) }
+# Benchmark.bm do |x|
+#   x.report("quick_sort1: ") { arr2 = quick_sort(arr2) }
+#   x.report("quick_sort2: ") { quick_sort(arr2) }
+# end
