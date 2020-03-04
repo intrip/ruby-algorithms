@@ -62,35 +62,32 @@ def bsearch_pivot(arr, val)
   res_a ? res_a : (res_b + arr_a.size)
 end
 
-# In this case i look for pivot and check where to go at the same time
-def bsearch_pivot_opt(arr, val, start=0, to=nil)
-  to= arr.size() -1 if to.nil?
+def bsearch_pivot_opt(nums, target)
+  low = 0
+  high = nums.length - 1
 
-  if to < start
-    return -1
-  end
+  while low <= high
+    mid = (low + high) / 2
+    return mid if nums[mid] == target
 
-  mid = (start+to) / 2
-
-  if val==arr[mid]
-    return mid
-  end
-
-  # if left side is sorted
-  if(arr[start] <= arr[mid])
-    if(val <= arr[mid] && val >= arr[start])
-      return bsearch_pivot_opt(arr,val,start,mid-1)
+    # left side is sorted
+    if nums[low] <= nums[mid]
+      if nums[low] <= target && target <= nums[mid]
+        high = mid - 1
+      else
+        low = mid + 1
+      end
+    else
+      # right side is sorted
+      if nums[mid] <= target && target <= nums[high]
+        low = mid + 1
+      else
+        high = mid - 1
+      end
     end
-    return bsearch_pivot_opt(arr,val,mid+1,to)
   end
 
-  # if left side is not sorted that means the right one is sorted because the pivot is in the left side
-  # so i compare with the right side
-  if(val >= arr[mid] && val <= arr[to])
-    return bsearch_pivot_opt(arr,val,mid+1,to)
-  end
-
-  return bsearch_pivot_opt(arr,val,start,mid-1)
+  -1
 end
 
 require 'benchmark'
