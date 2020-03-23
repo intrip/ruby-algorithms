@@ -57,21 +57,17 @@ def flatten_keys_2(hash)
 end
 
 def flatten_keys_r(hash)
-  res = {}
-
-  hash.each_key do |key|
-    if hash[key].is_a?(Hash)
-      flattened = flatten_keys_r(hash[key])
-      flattened.each do |subkey, subval|
-        new_key = "#{key}#{SEPARATOR}#{subkey}"
-        res[new_key] = subval
-      end
+  hash.reduce({}) do |h, (k, v)|
+    if !v.is_a?(Hash)
+      h[k] = v
     else
-      res[key] = hash[key]
+      flatten_keys_r(v).each_pair do |sub_k, sub_v|
+        h["#{k}#{SEPARATOR}#{sub_k}"] = sub_v
+      end
     end
-  end
 
-  res
+    h
+  end
 end
 
 p hash, flatten_keys(hash), flatten_keys_2(hash), flatten_keys_r(hash)
