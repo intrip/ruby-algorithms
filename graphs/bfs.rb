@@ -20,8 +20,10 @@ class Graph
     while u = queue.shift
       adj[vertices.index(u)].each do |v|
         next if v.c == 'b'
+
         v.dst = u.dst + 1
         v.prev = u
+        v.c = 'b'
         queue.push(v)
       end
       u.c = 'b'

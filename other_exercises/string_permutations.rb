@@ -33,27 +33,23 @@ end
 #
 # This function is O(n*n!)
 def permutations(str)
-  len = str.length
-  if len == 1
-    return Set.new([str])
-  end
+  return [str] if str.length == 1
 
-  res = Set.new([])
+  ans = []
   str.length.times do |i|
     head = str[i]
-    tail = str[0,i] + str[(i + 1),(len - 1 + i)]
+    tail = str[0, i] + str[(i + 1)..str.length - 1]
     permutations(tail).each do |permutation|
-      res << head + permutation
+      ans << head + permutation
     end
   end
 
-  res
+  ans
 end
 
 # using memoizing we can speedup his computation but it still takes O(n!)
 def permutations_memo(str, memo = {})
   if memo[str]
-    p "found #{str}"
     return memo[str]
   end
 
@@ -78,13 +74,13 @@ end
 a = permutations("123")
 b = get_permutations("123")
 c = permutations_memo("123")
-p a, b, a == b, b == c
+p a, b, c
 
 require 'benchmark'
 
-# Benchmark.bm do |x|
-#   x.report("get_permutations") { get_permutations("123456789") }
-#   x.report("permutations") { permutations("123456789") }
-#   x.report("permutations_memo") { permutations_memo("123456789") }
-# end
+Benchmark.bm do |x|
+  x.report("permutations") { permutations("123456789") }
+  x.report("get_permutations") { get_permutations("123456789") }
+  x.report("permutations_memo") { permutations_memo("123456789") }
+end
 
