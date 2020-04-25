@@ -15,6 +15,7 @@ class Graph
       v.prev = nil
     end
     start.dst = 0
+    start.c = 'b'
     queue = [start]
 
     while u = queue.shift
