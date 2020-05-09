@@ -26,6 +26,8 @@ class Node
   end
 end
 
+# Overall time complexity is O(m*n) where n is the n° of
+# nodes in the tree and m is the number of the *nodes given
 def search_boss(*nodes)
   nodes.each do |root|
     found = {}
