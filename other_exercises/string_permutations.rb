@@ -71,10 +71,28 @@ def permutations_memo(str, memo = {})
   res
 end
 
+def backtrack(nums, start = 0)
+  $ans << nums.dup if start == nums.length
+
+  start.upto(nums.length - 1).each do |i|
+    nums[i], nums[start] = nums[start], nums[i]
+    backtrack(nums, start + 1)
+    nums[i], nums[start] = nums[start], nums[i]
+  end
+end
+
+def permutations_backtrack(nums)
+  $ans= []
+
+  backtrack(nums)
+  $ans
+end
+
 a = permutations("123")
 b = get_permutations("123")
 c = permutations_memo("123")
-p a, b, c
+d = permutations_backtrack("123")
+p a, b, c, d
 
 require 'benchmark'
 
@@ -82,5 +100,6 @@ Benchmark.bm do |x|
   x.report("permutations") { permutations("123456789") }
   x.report("get_permutations") { get_permutations("123456789") }
   x.report("permutations_memo") { permutations_memo("123456789") }
+  x.report("permutations_backtrack") { permutations_backtrack("123456789") }
 end
 

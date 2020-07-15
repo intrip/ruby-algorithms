@@ -1,3 +1,18 @@
+# print infinitely the following sequence:
+#
+# 0
+# 1
+# 00
+# 01
+# 10
+# 11
+# 000
+# 001
+# 010
+# 011
+# 100
+# 101
+# ...
 def print_s
   num = ['0']
 
