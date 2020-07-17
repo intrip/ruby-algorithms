@@ -12,49 +12,65 @@ end
 
 #           1
 #     2           3
-#   4    5     6     7
-#  8 9 10 11 _  13 14 15
+#   _    5     6     7
+#  _ _ 10 11 _  13 14 15
 #
-# => [1,2,4,8,9,10,11,6,13,14,15,7,3]
-SEP = '-'
-def tree_border(root)
-  return [] unless root
-
-  left = []
-  current = root.left
-  while current && current.left
-    left.push(current.val)
-    current = current.left
-  end
-
-  leaves = []
-  stack = [root]
-  while current = stack.pop
-    stack.push current.right if current.right
-    stack.push current.left if current.left
-    if current.left.nil? || current.right.nil?
-      leaves.push(current.val)
-    end
-  end
-
-  right = []
-  current = root.right
-  while current && current.right
-    right.push(current.val)
-    current = current.right
-  end
-
-  [root.val] + left + leaves + right.reverse
-end
-
-
+# => [1,2,5,10,11,13,14,15,7,3]
+#
 root = Node.new(1,
                 Node.new(2,
-                          Node.new(4, Node.new(8), Node.new(9)),
                           Node.new(5, Node.new(10), Node.new(11))),
                 Node.new(3,
                           Node.new(6, nil, Node.new(13)),
                           Node.new(7, Node.new(14), Node.new(15)))
                )
+
+SEP = '-'
+def tree_border(root)
+  ans = []
+  return ans unless root
+
+  ans.push(root.val) unless leaf?(root)
+
+  current = root.left
+  while current && !leaf?(current)
+    ans.push(current.val)
+    if current.left
+      current = current.left
+    elsif current.right
+      current = current.right
+    else
+      current = false
+    end
+  end
+
+  stack = [root]
+  while current = stack.pop
+    if leaf?(current)
+      ans.push(current.val)
+    else
+      stack.push(current.right) if current.right
+      stack.push(current.left) if current.left
+    end
+  end
+
+  current = root.right
+  stack = []
+  while current && !leaf?(current)
+    stack.push(current.val)
+     if current.right
+      current = current.right
+    elsif current.left
+      current = current.left
+    else
+      current = false
+    end
+  end
+  ans.concat(stack.reverse)
+end
+
+def leaf?(node)
+  node && node.left.nil? && node.right.nil?
+end
 
 p tree_border(root)
